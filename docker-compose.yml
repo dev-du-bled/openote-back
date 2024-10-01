@@ -1,0 +1,12 @@
+services:
+  openote_db:
+    image: postgres
+    container_name: openote_db
+    environment:
+      POSTGRES_USER: openuser
+      POSTGRES_PASSWORD: openpass
+      POSTGRES_DB: openote
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./:/app
