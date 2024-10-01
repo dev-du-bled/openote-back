@@ -1,7 +1,7 @@
 import hashlib as hs
 import sys
-from datetime import timedelta as td
 from datetime import datetime as dt
+from datetime import timedelta as td
 
 import psycopg2 as pg
 from fastapi import FastAPI, HTTPException, status
@@ -12,6 +12,10 @@ from pydantic import BaseModel
 class LoginCred(BaseModel):
     email: str
     password: str
+
+
+class LogoutData(BaseModel):
+    token: str
 
 
 api = FastAPI()
@@ -30,7 +34,7 @@ async def read_root():
     return RedirectResponse("https://youtu.be/LDU_Txk06tM")
 
 
-@api.post("/login")
+@api.post("/login", name="Create a new session")
 async def login_endp(creds: LoginCred):
     with conn.cursor() as c:
         c.execute(
@@ -38,7 +42,7 @@ async def login_endp(creds: LoginCred):
         )
         res = c.fetchone()
         if res is None:
-            raise HTTPException(status_code=404, detail="User does not exists !")
+            raise HTTPException(status_code=404, detail="No such user !")
 
         if hs.sha256(creds.password.encode()).hexdigest() != res[1]:
             raise HTTPException(
@@ -57,3 +61,19 @@ async def login_endp(creds: LoginCred):
         conn.commit()
 
         return {"session_token": session_token}
+
+
+@api.post("/logout", name="End a session", status_code=status.HTTP_204_NO_CONTENT)
+async def logout_endp(logout_data: LogoutData):
+    with conn.cursor() as c:
+        c.execute(
+            """SELECT token FROM sessions WHERE token=%s;""", (logout_data.token,)
+        )
+        res = c.fetchone()
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
+            )
+
+        c.execute("""DELETE FROM sessions WHERE token=%s;""", (logout_data.token,))
+        conn.commit()
