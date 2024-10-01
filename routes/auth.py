@@ -12,7 +12,7 @@ class LoginCred(BaseModel):
 class LogoutData(BaseModel):
     token: str
 
-router = APIRouter()
+router = APIRouter(prefix="/auth")
 
 @router.post("/login", name="Create a new session")
 async def login_endp(creds: LoginCred):
