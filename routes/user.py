@@ -1,8 +1,7 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Header
 from pydantic import BaseModel
 from psycopg2.extras import RealDictCursor
 from db import get_db_connection
-from typing import Optional
 
 
 class GetUserData(BaseModel):
@@ -16,7 +15,7 @@ class UpdateUserData(BaseModel):
 
 
 class GetIconData(BaseModel):
-    id: Optional[int]
+    id: int
     token: str
 
 
@@ -24,12 +23,12 @@ router = APIRouter()
 
 
 @router.get("/user", name="Get user data")
-async def get_user_endp(user_data: GetUserData):
+async def get_user_endp(authentification: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         c.execute(
             """SELECT lastname, firstname, pronouns, email,role,profile_picture FROM "user" WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
-            (user_data.token,),
+            (authentification,),
         )
         res = c.fetchone()
         if res is None:
@@ -40,12 +39,16 @@ async def get_user_endp(user_data: GetUserData):
 
 
 @router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
-async def update_user_endp(user_data: UpdateUserData):
+async def update_user_endp(
+    authentification: str = Header(...),
+    email: str = Header(...),
+    profile_picture: str = Header(...),
+):
     conn = get_db_connection()
     with conn.cursor() as c:
         c.execute(
             """SELECT associated_user FROM sessions WHERE token=%s;""",
-            (user_data.token,),
+            (authentification,),
         )
         res = c.fetchone()
         if res is None:
@@ -54,30 +57,35 @@ async def update_user_endp(user_data: UpdateUserData):
             )
         c.execute(
             """UPDATE "user" SET email=%s,profile_picture=%s WHERE id=%s;""",
-            (user_data.email, user_data.profile_picture, res[0]),
+            (email, profile_picture, res[0]),
         )
         conn.commit()
 
 
 @router.get("/user/icon", name="Get icon data")
-async def get_icon_endp(icon_data: GetIconData):
+async def get_icon_endp(authentification: str = Header(...), id: int = Header(None)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        if icon_data.id is not None:
+        if id is not None:
             c.execute(
                 """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
-                (icon_data.token,),
+                (authentification,),
             )
             res = c.fetchone()
-            if res == "admin" or res == "teacher":
+            if res.get("role") == "admin" or res.get("role") == "teacher":
                 c.execute(
                     """SELECT profile_picture FROM "user" WHERE id=%s;""",
-                    (icon_data.id,),
+                    (id,),
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="You are not allowed to access this resource",
                 )
         else:
             c.execute(
                 """SELECT profile_picture FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
-                (icon_data.token,),
+                (authentification,),
             )
 
         res = c.fetchone()
