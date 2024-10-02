@@ -130,3 +130,4 @@ ADD FOREIGN KEY("user_id") REFERENCES "user"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 INSERT INTO "user" VALUES ( 0,'Davis','Terry','he/him', 'terry@temple.os', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', null );
+INSERT INTO "user" VALUES ( 1,'admin','admin','he/him', 'admin@admin.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'admin', null );
