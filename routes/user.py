@@ -17,12 +17,12 @@ router = APIRouter()
 
 
 @router.get("/user", name="Get user data")
-async def get_user_endp(authentification: str = Header(...)):
+async def get_user_endp(Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         c.execute(
             """SELECT lastname, firstname, pronouns, email,role,profile_picture FROM "user" WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
-            (authentification,),
+            (Authorization,),
         )
         res = c.fetchone()
         if res is None:
@@ -34,14 +34,14 @@ async def get_user_endp(authentification: str = Header(...)):
 
 @router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
 async def update_user_endp(
-    user_data: UpdateUserData, authentification: str = Header(...)
+    user_data: UpdateUserData, Authorization: str = Header(...)
 ):
     conn = get_db_connection()
     with conn.cursor() as c:
         print(user_data)
         c.execute(
             """SELECT associated_user FROM sessions WHERE token=%s;""",
-            (authentification,),
+            (Authorization,),
         )
         res = c.fetchone()
         if res is None:
