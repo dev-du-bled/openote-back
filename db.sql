@@ -5,20 +5,20 @@ CREATE TYPE "role" AS ENUM (
 	'admin'
 );
 CREATE TABLE "user" (
-	"id" INTEGER NOT NULL UNIQUE,
+	"id" SERIAL NOT NULL UNIQUE,
 	"lastname" VARCHAR NOT NULL,
 	"firstname" VARCHAR NOT NULL,
 	"pronouns" VARCHAR NOT NULL,
 	"email" VARCHAR NOT NULL,
 	"password_hash" VARCHAR NOT NULL,
 	"role" ROLE NOT NULL,
-	"profile_picture" BYTEA,
+	"profile_picture" VARCHAR,
 	PRIMARY KEY("id")
 );
 
 
 CREATE TABLE "student_info" (
-	"user_id" INTEGER NOT NULL UNIQUE,
+	"user_id" SERIAL NOT NULL UNIQUE,
 	"student_number" INTEGER NOT NULL,
 	"class" INTEGER NOT NULL UNIQUE,
 	"group" INTEGER UNIQUE,
@@ -27,8 +27,8 @@ CREATE TABLE "student_info" (
 
 
 CREATE TABLE "notes" (
-	"user_id" INTEGER NOT NULL UNIQUE,
-	"exam_id" INTEGER NOT NULL UNIQUE,
+	"user_id" SERIAL NOT NULL UNIQUE,
+	"exam_id" SERIAL NOT NULL UNIQUE,
 	"commentaire" TEXT,
 	"value" INTEGER NOT NULL,
 	"max_value" INTEGER NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE "notes" (
 
 
 CREATE TABLE "attendance" (
-	"class_id" INTEGER NOT NULL,
+	"class_id" SERIAL NOT NULL,
 	"student_id" INTEGER NOT NULL UNIQUE,
 	"present" BOOLEAN NOT NULL,
 	"expelled" BOOLEAN DEFAULT false,
@@ -50,33 +50,34 @@ CREATE TABLE "attendance" (
 
 
 CREATE TABLE "class" (
-	"id" INTEGER NOT NULL UNIQUE,
+	"id" SERIAL NOT NULL UNIQUE,
 	"name" VARCHAR NOT NULL,
 	PRIMARY KEY("id")
 );
 
 
 CREATE TABLE "parent" (
-	"parent_id" INTEGER NOT NULL UNIQUE,
+	"parent_id" SERIAL NOT NULL UNIQUE,
 	"user_id" INTEGER NOT NULL UNIQUE,
 	"child" INTEGER NOT NULL,
 	PRIMARY KEY("parent_id")
 );
 
 
-CREATE TABLE "groups" (
-	"id" INTEGER NOT NULL UNIQUE,
+CREATE TABLE "group" (
+	"id" SERIAL NOT NULL UNIQUE,
 	"name" VARCHAR,
 	PRIMARY KEY("id")
 );
 
 
 CREATE TABLE "assigned_homework" (
-	"id" INTEGER,
+	"id" SERIAL NOT NULL,
 	"title" VARCHAR NOT NULL,
 	"due_date" DATE NOT NULL,
-	"teacher" INTEGER NOT NULL,
+	"author" INTEGER NOT NULL,
 	"details" VARCHAR,
+	"assigned_class" INTEGER,
 	PRIMARY KEY("id")
 );
 
@@ -105,7 +106,7 @@ ALTER TABLE "student_info"
 ADD FOREIGN KEY("class") REFERENCES "class"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "student_info"
-ADD FOREIGN KEY("group") REFERENCES "groups"("id")
+ADD FOREIGN KEY("group") REFERENCES "group"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "homework_status"
 ADD FOREIGN KEY("homework") REFERENCES "assigned_homework"("id")
@@ -127,6 +128,9 @@ ADD FOREIGN KEY("associated_user") REFERENCES "user"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "student_info"
 ADD FOREIGN KEY("user_id") REFERENCES "user"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "assigned_homework"
+ADD FOREIGN KEY("assigned_class") REFERENCES "class"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 INSERT INTO "user" VALUES ( 0,'Davis','Terry','he/him', 'terry@temple.os', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', 'https://media.licdn.com/dms/image/v2/C5603AQEafuNrFr4eWg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1622207591637?e=2147483647&v=beta&t=lTdZ3yy5p9RvyY3YWZjduZUsak_zKdPehLgC6oM_0C0' );
