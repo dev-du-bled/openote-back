@@ -33,9 +33,7 @@ async def get_user_endp(Authorization: str = Header(...)):
 
 
 @router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
-async def update_user_endp(
-    user_data: UpdateUserData, Authorization: str = Header(...)
-):
+async def update_user_endp(user_data: UpdateUserData, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor() as c:
         print(user_data)

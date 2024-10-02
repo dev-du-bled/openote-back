@@ -5,11 +5,11 @@ from fastapi.responses import RedirectResponse
 from routes.auth.login import router as auth_login_router
 from routes.auth.logout import router as auth_logout_router
 
-# User route
-from routes.user import router as user_router
-
 # Manage routes
 from routes.manage.collection import router as manage_collection_router
+
+# User route
+from routes.user import router as user_router
 
 api = FastAPI()
 
