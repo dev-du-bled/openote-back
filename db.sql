@@ -6,6 +6,9 @@ CREATE TYPE "role" AS ENUM (
 );
 CREATE TABLE "user" (
 	"id" INTEGER NOT NULL UNIQUE,
+	"lastname" VARCHAR NOT NULL,
+	"firstname" VARCHAR NOT NULL,
+	"pronouns" VARCHAR NOT NULL,
 	"email" VARCHAR NOT NULL,
 	"password_hash" VARCHAR NOT NULL,
 	"role" ROLE NOT NULL,
@@ -16,8 +19,6 @@ CREATE TABLE "user" (
 
 CREATE TABLE "student_info" (
 	"user_id" INTEGER NOT NULL UNIQUE,
-	"lastname" VARCHAR NOT NULL,
-	"firstname" VARCHAR NOT NULL,
 	"student_number" INTEGER NOT NULL,
 	"class" INTEGER NOT NULL UNIQUE,
 	"group" INTEGER UNIQUE,
@@ -56,11 +57,10 @@ CREATE TABLE "class" (
 
 
 CREATE TABLE "parent" (
+	"parent_id" INTEGER NOT NULL UNIQUE,
 	"user_id" INTEGER NOT NULL UNIQUE,
-	"firstname" VARCHAR NOT NULL,
-	"lastname" VARCHAR NOT NULL,
-	"child" INTEGER NOT NULL UNIQUE,
-	PRIMARY KEY("user_id")
+	"child" INTEGER NOT NULL,
+	PRIMARY KEY("parent_id")
 );
 
 
@@ -98,35 +98,35 @@ CREATE TABLE "sessions" (
 );
 
 
-ALTER TABLE "student_info"
-ADD FOREIGN KEY("user_id") REFERENCES "user"("id")
-ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "parent"
 ADD FOREIGN KEY("user_id") REFERENCES "user"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
-ALTER TABLE "class"
-ADD FOREIGN KEY("id") REFERENCES "student_info"("class")
-ON UPDATE NO ACTION ON DELETE NO ACTION;
-ALTER TABLE "groups"
-ADD FOREIGN KEY("id") REFERENCES "student_info"("group")
-ON UPDATE NO ACTION ON DELETE NO ACTION;
-ALTER TABLE "assigned_homework"
-ADD FOREIGN KEY("id") REFERENCES "homework_status"("homework")
+ALTER TABLE "student_info"
+ADD FOREIGN KEY("class") REFERENCES "class"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "student_info"
-ADD FOREIGN KEY("user_id") REFERENCES "attendance"("student_id")
+ADD FOREIGN KEY("group") REFERENCES "groups"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
-ALTER TABLE "student_info"
-ADD FOREIGN KEY("user_id") REFERENCES "notes"("user_id")
+ALTER TABLE "homework_status"
+ADD FOREIGN KEY("homework") REFERENCES "assigned_homework"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
-ALTER TABLE "student_info"
-ADD FOREIGN KEY("user_id") REFERENCES "homework_status"("student")
+ALTER TABLE "attendance"
+ADD FOREIGN KEY("student_id") REFERENCES "student_info"("user_id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
-ALTER TABLE "student_info"
-ADD FOREIGN KEY("user_id") REFERENCES "parent"("child")
+ALTER TABLE "notes"
+ADD FOREIGN KEY("user_id") REFERENCES "student_info"("user_id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "homework_status"
+ADD FOREIGN KEY("student") REFERENCES "student_info"("user_id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "parent"
+ADD FOREIGN KEY("child") REFERENCES "student_info"("user_id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "sessions"
 ADD FOREIGN KEY("associated_user") REFERENCES "user"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE "student_info"
+ADD FOREIGN KEY("user_id") REFERENCES "user"("id")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
 
-INSERT INTO "user" VALUES ( 0, 'nya@nya.sh', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', null );
+INSERT INTO "user" VALUES ( 0,'Davis','Terry','he/him', 'terry@temple.os', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', null );

@@ -14,6 +14,7 @@ api.include_router(auth_login_router, prefix="/auth")
 api.include_router(auth_logout_router, prefix="/auth")
 api.include_router(user_router)
 
+
 @api.get("/")
 async def read_root():
     return RedirectResponse("https://youtu.be/LDU_Txk06tM")

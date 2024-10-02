@@ -4,11 +4,14 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from db import get_db_connection
 
+
 class LoginCred(BaseModel):
     email: str
     password: str
 
+
 router = APIRouter()
+
 
 @router.post("/login", name="Create a new session", status_code=status.HTTP_201_CREATED)
 async def login_endp(creds: LoginCred):
