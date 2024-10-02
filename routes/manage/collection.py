@@ -67,3 +67,25 @@ async def post_collection_endp(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="You are not allowed to access this resource",
                 )
+
+
+@router.delete("/{type}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_collection_endp(
+    Authorization: str = Header(...), type: str = None, id: int = None
+):
+    conn = get_db_connection()
+    with conn.cursor(cursor_factory=RealDictCursor) as c:
+        if type == "class" or type == "group":
+            c.execute(
+                """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
+                (Authorization,),
+            )
+            res = c.fetchone()
+            if res.get("role") == "admin" or res.get("role") == "teacher":
+                c.execute(f"""DELETE FROM "{type}" WHERE id=%s;""", (id,))
+                conn.commit()
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="You are not allowed to access this resource",
+                )
