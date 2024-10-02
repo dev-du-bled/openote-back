@@ -24,9 +24,13 @@ async def get_collection_endp(
             )
             res = c.fetchone()
             if res.get("role") == "admin" or res.get("role") == "teacher":
-                c.execute(f"""SELECT * FROM "{type}";""", (id,))
+                if id is None:
+                    c.execute(f"""SELECT * FROM "{type}";""")
+                    res = c.fetchall()
+                else:
+                    c.execute(f"""SELECT * FROM "{type}" WHERE id=%s;""", (id,))
+                    res = c.fetchone()
 
-                res = c.fetchone()
                 if res is None:
                     raise HTTPException(
                         status_code=status.HTTP_404_NOT_FOUND, detail=f"No such {type}"
