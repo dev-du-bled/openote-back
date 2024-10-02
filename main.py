@@ -9,14 +9,14 @@ from routes.auth.logout import router as auth_logout_router
 from routes.user import router as user_router
 
 # Manage routes
-# from routes.manage.user import router as manage_user_router
+from routes.manage.collection import router as manage_collection_router
 
 api = FastAPI()
 
 api.include_router(auth_login_router, prefix="/auth")
 api.include_router(auth_logout_router, prefix="/auth")
 api.include_router(user_router)
-# api.include_router(manage_user_router, prefix="/manage")
+api.include_router(manage_collection_router, prefix="/manage")
 
 
 @api.get("/")
