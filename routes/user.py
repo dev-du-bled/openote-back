@@ -1,23 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Header
-from pydantic import BaseModel
 from psycopg2.extras import RealDictCursor
 from db import get_db_connection
-
-
-class GetUserData(BaseModel):
-    token: str
-
-
-class UpdateUserData(BaseModel):
-    token: str
-    email: str
-    profile_picture: str
-
-
-class GetIconData(BaseModel):
-    id: int
-    token: str
-
 
 router = APIRouter()
 
@@ -41,8 +24,8 @@ async def get_user_endp(authentification: str = Header(...)):
 @router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
 async def update_user_endp(
     authentification: str = Header(...),
-    email: str = Header(...),
-    profile_picture: str = Header(...),
+    email: str = None,
+    profile_picture: str = None,
 ):
     conn = get_db_connection()
     with conn.cursor() as c:
@@ -63,7 +46,7 @@ async def update_user_endp(
 
 
 @router.get("/user/icon", name="Get icon data")
-async def get_icon_endp(authentification: str = Header(...), id: int = Header(None)):
+async def get_icon_endp(authentification: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         if id is not None:
