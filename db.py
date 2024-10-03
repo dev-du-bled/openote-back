@@ -1,5 +1,6 @@
 import psycopg2 as pg
 
+
 def get_db_connection():
     try:
         conn = pg.connect(
