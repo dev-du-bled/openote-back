@@ -23,6 +23,12 @@ async def get_collection_endp(
                 (Authorization,),
             )
             res = c.fetchone()
+
+            if res is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
+                )
+
             if res.get("role") == "admin" or res.get("role") == "teacher":
                 if id is None:
                     c.execute(f"""SELECT * FROM "{type}";""")

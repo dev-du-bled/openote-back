@@ -14,6 +14,12 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
             (Authorization,),
         )
         res = c.fetchone()
+
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
+            )
+
         if res.get("role") == "admin":
             if id is None:
                 c.execute("""SELECT * FROM "user";""")
