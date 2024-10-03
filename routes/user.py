@@ -21,9 +21,37 @@ async def get_user_endp(Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         c.execute(
-            """SELECT lastname, firstname, pronouns, email, role, profile_picture FROM "user" WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
+            """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
             (Authorization,),
         )
+        res = c.fetchone()
+
+        if res.get("role") == "student":
+            c.execute(
+                """SELECT
+                  u.lastname,
+                  u.firstname,
+                  u.pronouns,
+                  u.email,
+                  u.role,
+                  u.profile_picture,
+                  s.group,
+                  s.class
+              FROM
+                  "user" u
+              LEFT JOIN
+                  student_info s ON u.id = s.user_id
+              WHERE
+                  u.id = (SELECT associated_user FROM sessions WHERE token = %s);
+                  """,
+                (Authorization,),
+            )
+        else:
+            c.execute(
+                """SELECT lastname, firstname, pronouns, email, role, profile_picture FROM "user" WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
+                (Authorization,),
+            )
+
         res = c.fetchone()
         if res is None:
             raise HTTPException(
