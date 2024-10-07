@@ -32,12 +32,20 @@ async def login_endp(creds: LoginCred):
 
         now = dt.now()
         session_token = hs.md5((res[1] + str(now)).encode()).hexdigest()
+        expiration = now + td(days=3)
 
         # TODO: support extended time
         c.execute(
             """INSERT INTO sessions VALUES (%s, %s, %s, %s);""",
-            (session_token, res[0], now + td(days=3), False),
+            (session_token, res[0], expiration, False),
         )
         conn.commit()
 
-        return {"session_token": session_token}
+        c.execute("""SELECT role FROM "user" WHERE id=%s;""", (res[0],))
+        role = c.fetchone()[0]
+
+        return {
+            "session_token": session_token,
+            "expires_at": int(expiration.timestamp()),
+            "role": role,
+        }
