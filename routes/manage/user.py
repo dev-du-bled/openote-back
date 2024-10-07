@@ -112,6 +112,12 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
                 status_code=status.HTTP_409_CONFLICT, detail="User already exists"
             )
 
+        except errors.ForeignKeyViolation:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Group or class does not exist",
+            )
+
 
 @router.delete("/user", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user_endp(Authorization: str = Header(...), id: int = None):
