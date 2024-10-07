@@ -12,6 +12,9 @@ from routes.manage.collection import router as manage_collection_router
 
 # Attendance routes
 from routes.attendance.slash import router as attendance_main_router
+from routes.attendance.expells import router as attendance_expells_router
+from routes.attendance.late import router as attendance_late_router
+from routes.attendance.absence import router as attendance_absence_router
 
 # User route
 from routes.user import router as user_router
@@ -31,10 +34,17 @@ api.add_middleware(
 
 api.include_router(auth_login_router, prefix="/auth")
 api.include_router(auth_logout_router, prefix="/auth")
+
 api.include_router(manage_user_router, prefix="/manage")
 api.include_router(manage_collection_router, prefix="/manage")
+
 api.include_router(attendance_main_router, prefix="/attendance")
+api.include_router(attendance_expells_router, prefix="/attendance")
+api.include_router(attendance_late_router, prefix="/attendance")
+api.include_router(attendance_absence_router, prefix="/attendance")
+
 api.include_router(user_router)
+
 api.include_router(planning_router)
 
 

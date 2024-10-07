@@ -38,7 +38,7 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_role_is_admin(role)
+        ens.ensure_user_is_admin(role)
 
         if id is None:
             c.execute("""SELECT * FROM "user";""")
@@ -63,7 +63,7 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_role_is_admin(role)
+        ens.ensure_user_is_admin(role)
 
         try:
             query = """INSERT INTO "user" (lastname, firstname, pronouns, email, password_hash, role, profile_picture) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;"""

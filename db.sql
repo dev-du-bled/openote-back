@@ -20,8 +20,8 @@ CREATE TABLE "user" (
 CREATE TABLE "student_info" (
 	"user_id" SERIAL NOT NULL UNIQUE,
 	"student_number" INTEGER NOT NULL,
-	"class" INTEGER NOT NULL UNIQUE,
-	"group" INTEGER UNIQUE,
+	"class" INTEGER NOT NULL,
+	"group" INTEGER,
 	PRIMARY KEY("user_id")
 );
 
@@ -39,13 +39,14 @@ CREATE TABLE "notes" (
 
 
 CREATE TABLE "attendance" (
-	"class_id" SERIAL NOT NULL,
-	"student_id" INTEGER NOT NULL UNIQUE,
+  "attendance_id" SERIAL NOT NULL UNIQUE,
+	"class_id" INTEGER NOT NULL,
+	"student_id" INTEGER NOT NULL,
 	"present" BOOLEAN NOT NULL,
 	"expelled" BOOLEAN DEFAULT false,
 	"expel_reason" TEXT,
 	"late" BOOLEAN DEFAULT false,
-	PRIMARY KEY("class_id", "student_id")
+	PRIMARY KEY("attendance_id")
 );
 
 
@@ -113,6 +114,8 @@ ADD FOREIGN KEY("homework") REFERENCES "assigned_homework"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "attendance"
 ADD FOREIGN KEY("student_id") REFERENCES "student_info"("user_id")
+ALTER TABLE "attendance"
+ADD FOREIGN KEY("class_id") REFERENCES "class"("id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "notes"
 ADD FOREIGN KEY("user_id") REFERENCES "student_info"("user_id")
@@ -136,6 +139,7 @@ ON UPDATE NO ACTION ON DELETE NO ACTION;
 INSERT INTO "user" VALUES ( 0,'Davis','Terry','he/him', 'terry@temple.os', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', 'https://media.licdn.com/dms/image/v2/C5603AQEafuNrFr4eWg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1622207591637?e=2147483647&v=beta&t=lTdZ3yy5p9RvyY3YWZjduZUsak_zKdPehLgC6oM_0C0' );
 INSERT INTO "user" VALUES ( 1,'admin','admin','he/him', 'admin@admin.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'admin', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRE7KgplA1siIcsTTRlxcXeK9BSoepvdWLR8A&s' );
 INSERT INTO "user" VALUES ( 2,'Delavernhe', 'Florian', 'he/him', 'florian.delavernhe@gmail.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'teacher', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6Xs3UHtIG6xeDHwL1bM49tjPid1yfa7AGGA&s' );
+INSERT INTO "user" VALUES ( 3,'test','test','he/him', 'test@test.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', null );
 
 INSERT INTO "class" VALUES ( 0, 'BUT_1' );
 INSERT INTO "class" VALUES ( 1, 'BUT_2' );
@@ -146,5 +150,7 @@ INSERT INTO "group" VALUES ( 1, 'BUT_1_1' );
 INSERT INTO "group" VALUES ( 2, 'BUT_1_2' );
 
 INSERT INTO "student_info" VALUES ( 0, 123456, 1, 1 );
+INSERT INTO "student_info" VALUES ( 3, 120457, 1, 1 );
 
-INSERT INTO "attendance" VALUES ( 0, 0, true, false, '', false );
+INSERT INTO "attendance" VALUES ( 0, 0, 0, true, false, '', false );
+INSERT INTO "attendance" VALUES ( 1, 0, 3, true, true, 'puant', false );
