@@ -2,6 +2,7 @@ from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
+import hashlib as hs
 
 from db import get_db_connection
 
@@ -14,6 +15,19 @@ class UpdateUserData(BaseModel):
     group: int | None
     class_: int | None
     student_number: int | None
+
+
+class AddUserData(BaseModel):
+    lastname: str | None
+    firstname: str | None
+    pronouns: str | None
+    email: str | None
+    password: str | None
+    role: str | None
+    profile_picture: str | None
+    group: int | None = None
+    class_: int | None = None
+    student_number: int | None = None
 
 
 @router.get("/user")
@@ -49,6 +63,53 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="You are not allowed to access this resource",
+            )
+
+
+@router.post("/user", status_code=status.HTTP_201_CREATED)
+async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
+    conn = get_db_connection()
+    with conn.cursor(cursor_factory=RealDictCursor) as c:
+        c.execute(
+            """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
+            (Authorization,),
+        )
+        res = c.fetchone()
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
+            )
+
+        if res.get("role") != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="You are not allowed to access this resource",
+            )
+
+        try:
+            query = """INSERT INTO "user" (lastname, firstname, pronouns, email, password_hash, role, profile_picture) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;"""
+            values = [
+                ud.lastname,
+                ud.firstname,
+                ud.pronouns,
+                ud.email,
+                hs.sha256(ud.password.encode()).hexdigest(),
+                ud.role,
+                ud.profile_picture,
+            ]
+            c.execute(query, values)
+
+            user_id = c.fetchone()["id"]
+
+            if ud.role == "student":
+                student_query = """INSERT INTO "student_info" (user_id, student_number, class, "group") VALUES (%s, %s, %s, %s);"""
+                student_values = [user_id, ud.student_number, ud.class_, ud.group]
+                c.execute(student_query, student_values)
+
+            conn.commit()
+        except errors.UniqueViolation:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="User already exists"
             )
 
 
