@@ -41,7 +41,11 @@ async def login_endp(creds: LoginCred):
         )
         conn.commit()
 
+        c.execute("""SELECT role FROM "user" WHERE id=%s;""", (res[0],))
+        role = c.fetchone()[0]
+
         return {
             "session_token": session_token,
             "expires_at": int(expiration.timestamp()),
+            "role": role,
         }
