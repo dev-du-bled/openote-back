@@ -36,7 +36,7 @@ class AddUserData(BaseModel):
 async def get_user_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        role = ens.get_role_from_token(c, Authorization)  # noqa: F405
+        role = ens.get_role_from_token(c, Authorization)
 
         if role != "admin":
             raise HTTPException(

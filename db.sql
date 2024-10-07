@@ -146,3 +146,5 @@ INSERT INTO "group" VALUES ( 1, 'BUT_1_1' );
 INSERT INTO "group" VALUES ( 2, 'BUT_1_2' );
 
 INSERT INTO "student_info" VALUES ( 0, 123456, 1, 1 );
+
+INSERT INTO "attendance" VALUES ( 0, 0, true, false, '', false );
