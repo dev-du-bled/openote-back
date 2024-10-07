@@ -4,6 +4,8 @@ from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
 from db import get_db_connection
+import utils.ensurances as ens
+import utils.autogen as gen
 
 router = APIRouter()
 
@@ -20,68 +22,43 @@ class UpdateUserData(BaseModel):
 async def get_user_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        c.execute(
-            """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
-            (Authorization,),
-        )
-        res = c.fetchone()
-        if res is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
-            )
+        role = ens.get_role_from_token(c, Authorization)  # noqa: F405
 
-        if res.get("role") == "admin":
-            if id is None:
-                c.execute("""SELECT * FROM "user";""")
-                res = c.fetchall()
-            else:
-                c.execute("""SELECT * FROM "user" WHERE id=%s;""", (id,))
-                res = c.fetchone()
-
-            if res is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="No such user or no users",
-                )
-
-            return res
-        else:
+        if role != "admin":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="You are not allowed to access this resource",
             )
+
+        if id is None:
+            c.execute("""SELECT * FROM "user";""")
+            res = c.fetchall()
+
+        else:
+            c.execute("""SELECT * FROM "user" WHERE id=%s;""", (id,))
+            res = c.fetchone()
+
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No such user or no users",
+            )
+
+        return res
 
 
 @router.delete("/user", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user_endp(Authorization: str = Header(...), id: int = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        c.execute(
-            """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
-            (Authorization,),
-        )
-        res = c.fetchone()
+        role = ens.get_role_from_token(c, Authorization)
+        ens.ensure_user_is_admin(role)
 
-        if res is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
-            )
+        ens.ensure_is_id_provided(c, id)
 
-        if id is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="No user id provided"
-            )
-
-        if res.get("role") == "admin":
-            c.execute("""DELETE FROM "user" WHERE id=%s;""", (id,))
-            conn.commit()
-            return
-
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
-            )
+        c.execute("""DELETE FROM "user" WHERE id=%s;""", (id,))
+        conn.commit()
+        return
 
 
 @router.patch(
@@ -92,49 +69,12 @@ async def update_usr_endp(
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        print(user_data)
-        c.execute(
-            """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
-            (Authorization,),
-        )
-        res = c.fetchone()
+        role = ens.get_role_from_token(c, Authorization)
+        ens.ensure_user_is_admin(role)
+        ens.ensure_is_id_provided(c, id)
 
-        if res is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
-            )
-
-        if id is None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="No user id provided"
-            )
-
-        if res.get("role") != "admin":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
-            )
-
-        fields = map(
-            lambda n: '"' + (n[0:-1] if n[-1] == "_" else n) + '"',
-            list(UpdateUserData.__fields__.keys()),
-        )
-
-        fields = list(fields)
-        print(fields)
-
-        selected_fields = ",".join(list(fields))
-
-        # Would have been usefull if postgres allowed to edit multiple tables in one go
-
-        # edit_fields = ",".join(
-        #     list(
-        #         map(
-        #             lambda n: n + '"=%s',
-        #             fields,
-        #         )
-        #     )
-        # )
+        fields = gen.get_obj_fields(UpdateUserData)
+        selected_fields = gen.format_fields_to_select_sql(fields)
 
         c.execute(
             f"""SELECT {selected_fields} FROM "user" LEFT OUTER JOIN student_info ON student_info.user_id="user".id  WHERE "user".id=%s;""",
@@ -142,20 +82,10 @@ async def update_usr_endp(
         )
 
         old_data = c.fetchone()
+        new_data = gen.merge_data(UpdateUserData, old_data, user_data)
 
-        new_data = list()
-
-        for i, field_name in enumerate(list(fields)):
-            f_name = field_name.replace('"', "")
-            field_value = (
-                dict(user_data)[list(UpdateUserData.__fields__.keys())[i]]
-                or old_data[f_name]
-            )
-            new_data.append(field_value)
-
-        new_data = tuple(new_data)
         # Thanks postgres for ruining my fun by nyot allowing me to update accross multiple table in one row
-        print((new_data[2:] + (id,)))
+        # print((new_data[2:] + (id,)))
         try:
             c.execute(
                 """UPDATE "user" SET lastname=%s,firstname=%s WHERE id=%s;""",
@@ -167,6 +97,7 @@ async def update_usr_endp(
             )
 
             conn.commit()
+
         except errors.ForeignKeyViolation:
             raise HTTPException(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
