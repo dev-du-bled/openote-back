@@ -38,11 +38,7 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        if role != "admin":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
-            )
+        ens.ensure_role_is_admin(role)
 
         if id is None:
             c.execute("""SELECT * FROM "user";""")
@@ -65,21 +61,9 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
 async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        c.execute(
-            """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
-            (Authorization,),
-        )
-        res = c.fetchone()
-        if res is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="No such session"
-            )
+        role = ens.get_role_from_token(c, Authorization)
 
-        if res.get("role") != "admin":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
-            )
+        ens.ensure_role_is_admin(role)
 
         try:
             query = """INSERT INTO "user" (lastname, firstname, pronouns, email, password_hash, role, profile_picture) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;"""
