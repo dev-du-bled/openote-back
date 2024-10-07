@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 # Auth routes
 from routes.auth.login import router as auth_login_router
@@ -19,6 +20,14 @@ from routes.user import router as user_router
 from routes.planning import router as planning_router
 
 api = FastAPI()
+
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 api.include_router(auth_login_router, prefix="/auth")
 api.include_router(auth_logout_router, prefix="/auth")
