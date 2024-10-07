@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Header, HTTPException, status
-from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
-from db import get_db_connection
 
 
 class Event(BaseModel):
