@@ -41,4 +41,4 @@ async def login_endp(creds: LoginCred):
         )
         conn.commit()
 
-        return {"session_token": session_token, "expires_at": expiration}
+        return {"session_token": session_token, "expires_at": expiration.isoformat()}
