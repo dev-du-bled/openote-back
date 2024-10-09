@@ -10,4 +10,5 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db.sql:/app/db.sql
+      - ./base.sql:/app/base.sql
+      - ./entries.sql:/app/entries.sql

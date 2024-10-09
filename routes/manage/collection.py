@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Header, HTTPException, status
-import utils.ensurances as ens
+from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
+
+import utils.ensurances as ens
 from db import get_db_connection
 
 
@@ -25,12 +27,7 @@ async def get_collection_endp(
             )
 
         role = ens.get_role_from_token(c, Authorization)
-
-        if role != "admin" and role != "teacher":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
-            )
+        ens.ensure_user_is_admin(role)
 
         if id is None:
             c.execute(f"""SELECT * FROM "{type}";""")
@@ -55,18 +52,20 @@ async def post_collection_endp(
             )
 
         role = ens.get_role_from_token(c, Authorization)
+        ens.ensure_user_is_admin(role)
 
-        if role != "admin" and role != "teacher":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
+        try:
+            c.execute(
+                f"""INSERT INTO "{type}" (name) VALUES ( %s);""",
+                (ce.name,),
             )
+            conn.commit()
 
-        c.execute(
-            f"""INSERT INTO "{type}" (name) VALUES ( %s);""",
-            (ce.name,),
-        )
-        conn.commit()
+        except errors.UniqueViolation:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Element with name '{ce.name}' already exists",
+            )
 
 
 @router.delete("/{type}", status_code=status.HTTP_204_NO_CONTENT)
@@ -82,10 +81,15 @@ async def delete_collection_endp(
             )
 
         role = ens.get_role_from_token(c, Authorization)
-        if role != "admin" and role != "teacher":
+        ens.ensure_user_is_admin(role)
+
+        c.execute(f"""SELECT * FROM "{type}" WHERE id=%s;""", (id,))
+        res = c.fetchone()
+
+        if res is None:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No such element with id {id} in collection {type}",
             )
 
         c.execute(f"""DELETE FROM "{type}" WHERE id=%s;""", (id,))
@@ -105,10 +109,15 @@ async def update_collection_endp(
             )
 
         role = ens.get_role_from_token(c, Authorization)
-        if role != "admin" and "role" != "teacher":
+        ens.ensure_user_is_admin(role)
+
+        c.execute(f"""SELECT * FROM "{type}" WHERE id=%s;""", (id,))
+        res = c.fetchone()
+
+        if res is None:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not allowed to access this resource",
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No such element with id {id} in collection {type}",
             )
 
         c.execute(

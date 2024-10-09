@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Header, HTTPException, status
+from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
-from db import get_db_connection
-import utils.ensurances as ens
+
 import utils.autogen as gen
+import utils.ensurances as ens
+from db import get_db_connection
 
 router = APIRouter()
 
@@ -12,9 +14,6 @@ class Attendance(BaseModel):
     class_id: int | None
     student_id: int | None
     present: bool | None
-    expelled: bool | None
-    expel_reason: str | None
-    late: bool | None
 
 
 @router.get("", name="Get attendance")
@@ -25,12 +24,20 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
 
         ens.ensure_user_is_admin(role)
 
+        fields = gen.get_obj_fields(Attendance)
+        selected_fields = gen.format_fields_to_select_sql(fields)
+
         if id is None:
-            c.execute("""SELECT * FROM attendance;""")
+            c.execute(
+                f"""SELECT {selected_fields} FROM attendance WHERE present=True;"""
+            )
             res = c.fetchall()
 
         else:
-            c.execute("""SELECT * FROM attendance WHERE class_id=%s;""", (id,))
+            c.execute(
+                f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND present=True;""",
+                (id,),
+            )
             res = c.fetchall()
 
         if res is None:
@@ -54,16 +61,30 @@ async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)
         fields = gen.get_obj_fields(Attendance)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
-        c.execute(
-            f"""INSERT INTO attendance ({selected_fields}) VALUES (%s, %s, %s, %s, %s, %s);""",
-            (
-                att.class_id,
-                att.student_id,
-                att.present,
-                att.expelled,
-                att.expel_reason,
-                att.late,
-            ),
-        )
+        try:
+            c.execute(
+                """SELECT * FROM student_info WHERE user_id=%s;""", (att.student_id,)
+            )
 
-        conn.commit()
+            if c.fetchone() is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No such student",
+                )
+
+            c.execute(
+                f"""INSERT INTO attendance ({selected_fields}) VALUES (%s, %s, %s);""",
+                (
+                    att.class_id,
+                    att.student_id,
+                    att.present,
+                ),
+            )
+
+            conn.commit()
+
+        except errors.UniqueViolation:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This attendance already exists",
+            )

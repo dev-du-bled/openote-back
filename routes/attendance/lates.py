@@ -9,32 +9,30 @@ from db import get_db_connection
 router = APIRouter()
 
 
-class Expell(BaseModel):
+class Late(BaseModel):
     class_id: int | None
     student_id: int | None
-    expell_reason: str | None
+    late: bool | None
 
 
-@router.get("/expells", name="Get attendance")
-async def get_expells_endp(Authorization: str = Header(...), id: int | None = None):
+@router.get("/lates", name="Get attendance")
+async def get_lates_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
         ens.ensure_user_is_admin(role)
 
-        fields = gen.get_obj_fields(Expell)
+        fields = gen.get_obj_fields(Late)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
         if id is None:
-            c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE expelled=True;"""
-            )
+            c.execute(f"""SELECT {selected_fields} FROM attendance WHERE late=True;""")
             res = c.fetchall()
 
         else:
             c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND expelled=True;""",
+                f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND late=True;""",
                 (id,),
             )
             res = c.fetchall()
@@ -48,8 +46,8 @@ async def get_expells_endp(Authorization: str = Header(...), id: int | None = No
         return res
 
 
-@router.post("/expells", status_code=status.HTTP_204_NO_CONTENT)
-async def post_expells_endp(exp: Expell, Authorization: str = Header(...)):
+@router.post("/lates", status_code=status.HTTP_204_NO_CONTENT)
+async def post_lates_endp(late: Late, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -58,26 +56,18 @@ async def post_expells_endp(exp: Expell, Authorization: str = Header(...)):
 
         c.execute(
             """SELECT * FROM attendance WHERE class_id=%s AND student_id=%s;""",
-            (exp.class_id, exp.student_id),
+            (late.class_id, late.student_id),
         )
 
-        res = c.fetchone()
-
-        if res is None:
+        if c.fetchone() is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No such attendance or no attendances",
             )
 
-        if res["expelled"]:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Student already expelled",
-            )
-
         c.execute(
-            """UPDATE attendance SET expelled=True, expel_reason=%s WHERE class_id=%s AND student_id=%s;""",
-            (exp.expel_reason, exp.class_id, exp.student_id),
+            """UPDATE attendance SET late=%s WHERE class_id=%s AND student_id=%s;""",
+            (late.late, late.class_id, late.student_id),
         )
 
         conn.commit()
