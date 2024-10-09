@@ -1,12 +1,13 @@
+import hashlib as hs
+
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
-import hashlib as hs
 
-from db import get_db_connection
-import utils.ensurances as ens
 import utils.autogen as gen
+import utils.ensurances as ens
+from db import get_db_connection
 
 router = APIRouter()
 

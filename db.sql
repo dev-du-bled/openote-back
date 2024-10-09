@@ -51,7 +51,7 @@ CREATE TABLE "attendance" (
 
 CREATE TABLE "class" (
 	"id" SERIAL NOT NULL UNIQUE,
-	"name" VARCHAR NOT NULL,
+	"name" VARCHAR NOT NULL UNIQUE,
 	PRIMARY KEY("id")
 );
 
@@ -66,7 +66,7 @@ CREATE TABLE "parent" (
 
 CREATE TABLE "group" (
 	"id" SERIAL NOT NULL UNIQUE,
-	"name" VARCHAR,
+	"name" VARCHAR UNIQUE,
 	PRIMARY KEY("id")
 );
 

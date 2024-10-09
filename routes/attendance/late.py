@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
-from db import get_db_connection
+
 import utils.ensurances as ens
+from db import get_db_connection
 
 router = APIRouter()
 

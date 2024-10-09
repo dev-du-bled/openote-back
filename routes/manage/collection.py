@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Header, HTTPException, status
-import utils.ensurances as ens
 from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
+
+import utils.ensurances as ens
 from db import get_db_connection
 
 
