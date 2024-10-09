@@ -13,7 +13,7 @@ from routes.manage.collection import router as manage_collection_router
 # Attendance routes
 from routes.attendance.slash import router as attendance_main_router
 from routes.attendance.expells import router as attendance_expells_router
-from routes.attendance.late import router as attendance_late_router
+from routes.attendance.lates import router as attendance_lates_router
 
 # User route
 from routes.user import router as user_router
@@ -39,7 +39,7 @@ api.include_router(manage_collection_router, prefix="/manage")
 
 api.include_router(attendance_main_router, prefix="/attendance")
 api.include_router(attendance_expells_router, prefix="/attendance")
-api.include_router(attendance_late_router, prefix="/attendance")
+api.include_router(attendance_lates_router, prefix="/attendance")
 
 api.include_router(user_router)
 

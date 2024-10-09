@@ -65,6 +65,7 @@ async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)
             c.execute(
                 """SELECT * FROM student_info WHERE user_id=%s;""", (att.student_id,)
             )
+
             if c.fetchone() is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,

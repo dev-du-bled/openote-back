@@ -43,7 +43,7 @@ CREATE TABLE "attendance" (
 	"student_id" INTEGER NOT NULL,
 	"present" BOOLEAN NOT NULL,
 	"expelled" BOOLEAN DEFAULT false,
-	"expel_reason" TEXT,
+	"expell_reason" TEXT,
 	"late" BOOLEAN DEFAULT false,
 	PRIMARY KEY("class_id", "student_id")
 );
