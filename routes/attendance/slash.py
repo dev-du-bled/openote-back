@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
+from psycopg2 import errors
 from pydantic import BaseModel
 from db import get_db_connection
 import utils.ensurances as ens
@@ -54,16 +55,23 @@ async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)
         fields = gen.get_obj_fields(Attendance)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
-        c.execute(
-            f"""INSERT INTO attendance ({selected_fields}) VALUES (%s, %s, %s, %s, %s, %s);""",
-            (
-                att.class_id,
-                att.student_id,
-                att.present,
-                att.expelled,
-                att.expel_reason,
-                att.late,
-            ),
-        )
+        try:
+            c.execute(
+                f"""INSERT INTO attendance ({selected_fields}) VALUES (%s, %s, %s, %s, %s, %s);""",
+                (
+                    att.class_id,
+                    att.student_id,
+                    att.present,
+                    att.expelled,
+                    att.expel_reason,
+                    att.late,
+                ),
+            )
 
-        conn.commit()
+            conn.commit()
+
+        except errors.UniqueViolation:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This attendance already exists",
+            )

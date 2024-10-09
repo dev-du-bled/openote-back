@@ -93,7 +93,7 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
 
         except errors.ForeignKeyViolation:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail="Group or class does not exist",
             )
 
@@ -107,9 +107,17 @@ async def delete_user_endp(Authorization: str = Header(...), id: int = None):
 
         ens.ensure_is_id_provided(c, id)
 
+        c.execute("""SELECT * FROM "user" WHERE id=%s;""", (id,))
+        res = c.fetchone()
+
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No such user",
+            )
+
         c.execute("""DELETE FROM "user" WHERE id=%s;""", (id,))
         conn.commit()
-        return
 
 
 @router.patch(
@@ -151,6 +159,6 @@ async def update_usr_endp(
 
         except errors.ForeignKeyViolation:
             raise HTTPException(
-                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail="No such group or class",
             )
