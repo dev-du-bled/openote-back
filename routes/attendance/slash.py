@@ -30,8 +30,8 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
             res = c.fetchall()
 
         else:
-            c.execute("""SELECT * FROM attendance WHERE student_id=%s;""", (id,))
-            res = c.fetchone()
+            c.execute("""SELECT * FROM attendance WHERE class_id=%s;""", (id,))
+            res = c.fetchall()
 
         if res is None:
             raise HTTPException(
