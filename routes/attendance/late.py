@@ -20,7 +20,7 @@ async def get_attendance_endp(Authorization: str = Header(...), id: int | None =
 
         else:
             c.execute(
-                """SELECT * FROM attendance WHERE student_id=%s AND late=True;""",
+                """SELECT * FROM attendance WHERE class_id=%s AND late=True;""",
                 (id,),
             )
             res = c.fetchall()
