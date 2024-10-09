@@ -1,3 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+GRANT USAGE ON SCHEMA cron TO openuser;
+
+
 CREATE TYPE "role" AS ENUM (
 	'parent',
 	'student',
@@ -151,3 +155,5 @@ INSERT INTO "student_info" VALUES ( 3, 120457, 1, 1 );
 
 INSERT INTO "attendance" VALUES ( 0, 0, true, false, '', false );
 INSERT INTO "attendance" VALUES ( 0, 3, true, true, 'puant', false );
+
+SELECT cron.schedule('0 00 * * *', $$DELETE FROM sessions WHERE DATE_PART('EPOCH', expires_at) < (SELECT DATE_PART('EPOCH', CURRENT_TIMESTAMP));$$);

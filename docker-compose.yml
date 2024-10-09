@@ -1,6 +1,7 @@
 services:
   openote_db:
-    image: postgres
+    # image: postgres
+    build: .
     container_name: openote_db
     environment:
       POSTGRES_USER: openuser
