@@ -95,7 +95,7 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
         except errors.ForeignKeyViolation:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Group or class does not exist",
+                detail="No such class or group",
             )
 
 
