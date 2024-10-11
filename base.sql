@@ -33,7 +33,7 @@ CREATE TABLE "student_info" (
 CREATE TABLE "notes" (
 	"user_id" SERIAL NOT NULL UNIQUE,
 	"exam_id" SERIAL NOT NULL UNIQUE,
-	"commentaire" TEXT,
+	"comment" TEXT,
 	"value" INTEGER NOT NULL,
 	"max_value" INTEGER NOT NULL,
 	"coefficient" DECIMAL DEFAULT 1,
@@ -123,7 +123,7 @@ ADD FOREIGN KEY("user_id") REFERENCES "student_info"("user_id")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "homework_status"
 ADD FOREIGN KEY("student") REFERENCES "student_info"("user_id")
-ON UPDATE NO ACTION ON DELETE NO ACTION;
+ON UPDATE NO ACTION ON DELETE CASCADE;
 ALTER TABLE "parent"
 ADD FOREIGN KEY("child") REFERENCES "student_info"("user_id")
 ON UPDATE NO ACTION ON DELETE CASCADE;
