@@ -48,7 +48,7 @@ async def get_expells_endp(Authorization: str = Header(...), id: int | None = No
         return res
 
 
-@router.post("/expells", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/expells", name="Add expell", status_code=status.HTTP_204_NO_CONTENT)
 async def post_expells_endp(exp: Expell, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:

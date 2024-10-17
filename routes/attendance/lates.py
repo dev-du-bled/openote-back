@@ -46,7 +46,7 @@ async def get_lates_endp(Authorization: str = Header(...), id: int | None = None
         return res
 
 
-@router.post("/lates", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/lates", name="Mark as late", status_code=status.HTTP_204_NO_CONTENT)
 async def post_lates_endp(late: Late, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
