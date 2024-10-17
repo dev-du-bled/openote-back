@@ -5,7 +5,7 @@ from db import get_db_connection
 router = APIRouter()
 
 
-@router.post("/logout", name="End a session", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/logout", name="Logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout_endp(Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor() as c:

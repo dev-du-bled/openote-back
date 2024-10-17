@@ -15,7 +15,7 @@ class Expell(BaseModel):
     expell_reason: str | None
 
 
-@router.get("/expells", name="Get attendance")
+@router.get("/expells", name="Get expells")
 async def get_expells_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:

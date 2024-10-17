@@ -10,7 +10,7 @@ class Event(BaseModel):
 router = APIRouter()
 
 
-@router.get("/planning", name="Get all events")
+@router.get("/planning", name="Get events")
 async def get_planning_endp(event: Event):
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not implemented"

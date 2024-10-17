@@ -33,7 +33,7 @@ class AddUserData(BaseModel):
     student_number: int | None = None
 
 
-@router.get("/user")
+@router.get("/user", name="Manage user")
 async def get_user_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:

@@ -16,7 +16,7 @@ class LoginCred(BaseModel):
 router = APIRouter()
 
 
-@router.post("/login", name="Create a new session", status_code=status.HTTP_201_CREATED)
+@router.post("/login", name="Login", status_code=status.HTTP_201_CREATED)
 async def login_endp(creds: LoginCred):
     conn = get_db_connection()
     with conn.cursor() as c:

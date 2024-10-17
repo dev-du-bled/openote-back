@@ -14,7 +14,7 @@ class Element(BaseModel):
 router = APIRouter()
 
 
-@router.get("/{type}")
+@router.get("/{type}", name="Manage collection")
 async def get_collection_endp(
     Authorization: str = Header(...), type: str = None, id: int | None = None
 ):

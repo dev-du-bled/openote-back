@@ -15,7 +15,7 @@ class Late(BaseModel):
     late: bool | None
 
 
-@router.get("/lates", name="Get attendance")
+@router.get("/lates", name="Get lates")
 async def get_lates_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
