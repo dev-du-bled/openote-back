@@ -21,6 +21,9 @@ from routes.user import router as user_router
 # Planning route
 from routes.planning import router as planning_router
 
+# Exam route
+from routes.exam import router as exam_router
+
 api = FastAPI()
 
 api.add_middleware(
@@ -44,6 +47,8 @@ api.include_router(attendance_lates_router, prefix="/attendance")
 api.include_router(user_router)
 
 api.include_router(planning_router)
+
+api.include_router(exam_router, prefix="/exam")
 
 
 @api.get("/")
