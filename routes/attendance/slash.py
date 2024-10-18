@@ -49,7 +49,7 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
         return res
 
 
-@router.post("", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("", name="Add attendance", status_code=status.HTTP_204_NO_CONTENT)
 async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)):
     print(att)
     conn = get_db_connection()

@@ -33,7 +33,7 @@ class AddUserData(BaseModel):
     student_number: int | None = None
 
 
-@router.get("/user", name="Manage user")
+@router.get("/user", name="Get users data")
 async def get_user_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -58,7 +58,7 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
         return res
 
 
-@router.post("/user", status_code=status.HTTP_201_CREATED)
+@router.post("/user", name="Add user", status_code=status.HTTP_201_CREATED)
 async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -99,7 +99,7 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
             )
 
 
-@router.delete("/user", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/user", name="Delete user", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user_endp(Authorization: str = Header(...), id: int = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -121,9 +121,7 @@ async def delete_user_endp(Authorization: str = Header(...), id: int = None):
         conn.commit()
 
 
-@router.patch(
-    "/user", name="Change a user info", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.patch("/user", name="Edit user", status_code=status.HTTP_204_NO_CONTENT)
 async def update_usr_endp(
     user_data: UpdateUserData, Authorization: str = Header(...), id: int = None
 ):

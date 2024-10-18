@@ -14,7 +14,7 @@ class Element(BaseModel):
 router = APIRouter()
 
 
-@router.get("/{type}", name="Manage collection")
+@router.get("/{type}", name="Get collection")
 async def get_collection_endp(
     Authorization: str = Header(...), type: str = None, id: int | None = None
 ):
@@ -39,7 +39,7 @@ async def get_collection_endp(
         return res
 
 
-@router.post("/{type}", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/{type}", name="Add collection", status_code=status.HTTP_204_NO_CONTENT)
 async def post_collection_endp(
     ce: Element, Authorization: str = Header(...), type: str = None
 ):
@@ -68,7 +68,9 @@ async def post_collection_endp(
             )
 
 
-@router.delete("/{type}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{type}", name="Delete collection", status_code=status.HTTP_204_NO_CONTENT
+)
 async def delete_collection_endp(
     Authorization: str = Header(...), type: str = None, id: int = None
 ):
@@ -96,7 +98,7 @@ async def delete_collection_endp(
         conn.commit()
 
 
-@router.patch("/{type}", status_code=status.HTTP_204_NO_CONTENT)
+@router.patch("/{type}", name="Edit collection", status_code=status.HTTP_204_NO_CONTENT)
 async def update_collection_endp(
     pe: Element, Authorization: str = Header(...), type: str = None, id: int = None
 ):
