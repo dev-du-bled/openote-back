@@ -22,8 +22,6 @@ async def get_exam_endp(Authorization: str = Header(...), id: int | None = None)
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
 
-        # ens.ensure_user_is_role(role, "teacher")
-
         fields = gen.get_obj_fields(Exam)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
@@ -69,7 +67,10 @@ async def edit_exam_endp(id: int | None, exam: Exam, Authorization: str = Header
         ens.ensure_user_is_role(role, "teacher")
 
         fields = gen.get_obj_fields(Exam)
-        c.execute(f"SELECT {gen.format_fields_to_select_sql(fields)} FROM exams WHERE id=%s;", (id,))
+        c.execute(
+            f"SELECT {gen.format_fields_to_select_sql(fields)} FROM exams WHERE id=%s;",
+            (id,),
+        )
         old_data = c.fetchone()
         if old_data is None:
             raise HTTPException(
@@ -80,7 +81,10 @@ async def edit_exam_endp(id: int | None, exam: Exam, Authorization: str = Header
         new_data = gen.merge_data(Exam, old_data, exam)
         print(new_data)
 
-        c.execute(f"""UPDATE "exams" SET {gen.format_fields_to_update_sql(fields)} WHERE id=%s""", (new_data + (id,)))
+        c.execute(
+            f"""UPDATE "exams" SET {gen.format_fields_to_update_sql(fields)} WHERE id=%s""",
+            (new_data + (id,)),
+        )
         conn.commit()
 
 
@@ -92,5 +96,8 @@ async def create_exam_endp(exam: Exam, Authorization: str = Header(...)):
         ens.ensure_user_is_role(role, "teacher")
         ens.ensure_fields_nonnull(exam)
 
-        c.execute(f"""INSERT INTO exams ({gen.format_fields_to_select_sql(gen.get_obj_fields(Exam))}) VALUES (%s, %s, %s, %s)""", (exam.title, exam.max_mark, exam.coefficient, exam.date))
+        c.execute(
+            f"""INSERT INTO exams ({gen.format_fields_to_select_sql(gen.get_obj_fields(Exam))}) VALUES (%s, %s, %s, %s)""",
+            (exam.title, exam.max_mark, exam.coefficient, exam.date),
+        )
         conn.commit()

@@ -24,6 +24,9 @@ from routes.planning import router as planning_router
 # Exam route
 from routes.exam import router as exam_router
 
+# Marks route
+from routes.marks import router as marks_router
+
 api = FastAPI()
 
 api.add_middleware(
@@ -49,6 +52,8 @@ api.include_router(user_router)
 api.include_router(planning_router)
 
 api.include_router(exam_router, prefix="/exam")
+
+api.include_router(marks_router, prefix="/marks")
 
 
 @api.get("/")
