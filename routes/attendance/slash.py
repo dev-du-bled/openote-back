@@ -51,7 +51,6 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
 
 @router.post("", name="Add attendance", status_code=status.HTTP_204_NO_CONTENT)
 async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)):
-    print(att)
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -62,15 +61,7 @@ async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
         try:
-            c.execute(
-                """SELECT * FROM student_info WHERE user_id=%s;""", (att.student_id,)
-            )
-
-            if c.fetchone() is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="No such student",
-                )
+            _ = ens.ensure_given_id_is_student(c, att.student_id)
 
             c.execute(
                 f"""INSERT INTO attendance ({selected_fields}) VALUES (%s, %s, %s);""",

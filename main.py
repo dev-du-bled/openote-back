@@ -1,31 +1,32 @@
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+
+from routes.attendance.expells import router as attendance_expells_router
+from routes.attendance.lates import router as attendance_lates_router
+
+# Attendance routes
+from routes.attendance.slash import router as attendance_main_router
 
 # Auth routes
 from routes.auth.login import router as auth_login_router
 from routes.auth.logout import router as auth_logout_router
 
-# Manage routes
-from routes.manage.user import router as manage_user_router
+# Exam route
+from routes.exam import router as exam_router
 from routes.manage.collection import router as manage_collection_router
 
-# Attendance routes
-from routes.attendance.slash import router as attendance_main_router
-from routes.attendance.expells import router as attendance_expells_router
-from routes.attendance.lates import router as attendance_lates_router
+# Manage routes
+from routes.manage.user import router as manage_user_router
 
-# User route
-from routes.user import router as user_router
+# Marks route
+from routes.marks import router as marks_router
 
 # Planning route
 from routes.planning import router as planning_router
 
-# Exam route
-from routes.exam import router as exam_router
-
-# Marks route
-from routes.marks import router as marks_router
+# User route
+from routes.user import router as user_router
 
 api = FastAPI()
 
