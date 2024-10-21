@@ -16,3 +16,9 @@ INSERT INTO "student_info" VALUES ( 3, 120457, 1, 1 );
 
 INSERT INTO "attendance" VALUES ( 0, 0, true, false, '', false );
 INSERT INTO "attendance" VALUES ( 0, 3, true, true, 'puant', false );
+
+INSERT INTO "exams" VALUES ( 0, 'Système', 20, 1, '2021-12-12' );
+INSERT INTO "exams" VALUES ( 1, 'Réseau', 10, 2, '2021-12-13' );
+
+INSERT INTO "marks" VALUES ( 3, 0, 15 );
+INSERT INTO "marks" VALUES ( 0, 1, 5 );
