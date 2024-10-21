@@ -3,16 +3,19 @@ import psycopg2 as pg
 from fastapi import HTTPException, status
 
 
-def get_role_from_token(c, Authorization: str)-> str:
+def get_user_col_from_token(c,col:str, Authorization: str)-> str:
     c.execute(
-        """SELECT role FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
+        f"""SELECT {col} FROM "user" WHERE id=(SELECT associated_user FROM "sessions" WHERE token=%s);""",
         (Authorization,),
     )
     res = c.fetchone()
     if res is not None:
-        return res.get("role")
+        return res.get(col)
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such session")
+
+def get_role_from_token(c, Authorization: str)-> str:
+   return get_user_col_from_token(c, "role", Authorization)
 
 
 def ensure_is_id_provided(c, id: int | None) -> None:

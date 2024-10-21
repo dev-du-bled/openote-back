@@ -1,8 +1,11 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Auth routes
+from routes import upload
 from routes.auth.login import router as auth_login_router
 from routes.auth.logout import router as auth_logout_router
 
@@ -23,6 +26,16 @@ from routes.planning import router as planning_router
 
 # Exam route
 from routes.exam import router as exam_router
+
+# Upload route
+from routes.upload import router as upload_router
+
+# Static storage
+from fastapi.staticfiles import StaticFiles
+
+if not os.path.exists("storage/logos/"):
+    os.mkdir("storage")
+    os.mkdir("storage/logos")
 
 api = FastAPI()
 
@@ -50,6 +63,8 @@ api.include_router(planning_router)
 
 api.include_router(exam_router, prefix="/exam")
 
+api.mount("/images/logos", StaticFiles(directory="storage/logos"), name="Static file storage")
+api.include_router(upload_router, prefix="/upload")
 
 @api.get("/")
 async def read_root():

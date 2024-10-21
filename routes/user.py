@@ -10,7 +10,6 @@ class UpdateUserData(BaseModel):
     firstname: str | None
     pronouns: str | None
     email: str | None
-    profile_picture: str | None
 
 
 router = APIRouter()
@@ -77,19 +76,18 @@ async def update_user_endp(user_data: UpdateUserData, Authorization: str = Heade
             )
 
         c.execute(
-            """SELECT lastname,firstname,pronouns,email,profile_picture FROM "user" WHERE id=%s;""",
+            """SELECT lastname,firstname,pronouns,email FROM "user" WHERE id=%s;""",
             (res[0],),
         )
         old_data = c.fetchone()
 
         c.execute(
-            """UPDATE "user" SET lastname=%s,firstname=%s,pronouns=%s,email=%s,profile_picture=%s WHERE id=%s;""",
+            """UPDATE "user" SET lastname=%s,firstname=%s,pronouns=%s,email=%s WHERE id=%s;""",
             (
                 user_data.lastname or old_data[0],
                 user_data.firstname or old_data[1],
                 user_data.pronouns or old_data[2],
                 user_data.email or old_data[3],
-                user_data.profile_picture or old_data[4],
                 res[0],
             ),
         )
