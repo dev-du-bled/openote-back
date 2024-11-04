@@ -25,9 +25,6 @@ async def get_marks_endp(
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        fields = gen.get_obj_fields(Marks)
-        selected_fields = gen.format_fields_to_select_sql(fields)
-
         if user_id is None and exam_id is None:
             ens.ensure_user_is_role(role, "student")
             role_id = ens.get_user_col_from_token(c, "id", Authorization)
