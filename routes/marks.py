@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Header, HTTPException, status
+from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
@@ -26,7 +27,7 @@ async def get_marks_endp(
         role = ens.get_role_from_token(c, Authorization)
 
         if user_id is None and exam_id is None:
-            ens.ensure_user_is_role(role, "student")
+            ens.ensure_user_is_role(role, ens.UserRole.student)
             role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
             c.execute(
@@ -40,7 +41,7 @@ async def get_marks_endp(
             res = c.fetchall()
 
         elif user_id is not None and exam_id is not None:
-            ens.ensure_user_is_role(role, "teacher")
+            ens.ensure_user_is_role(role, ens.UserRole.teacher)
             ens.ensure_given_id_is_student(c, user_id)
 
             c.execute(
@@ -54,7 +55,7 @@ async def get_marks_endp(
             res = c.fetchone()
 
         elif user_id is not None:
-            ens.ensure_user_is_role(role, "teacher")
+            ens.ensure_user_is_role(role, ens.UserRole.teacher)
             ens.ensure_given_id_is_student(c, user_id)
 
             c.execute(
@@ -68,7 +69,7 @@ async def get_marks_endp(
             res = c.fetchall()
 
         elif exam_id is not None:
-            ens.ensure_user_is_role(role, "teacher")
+            ens.ensure_user_is_role(role, ens.UserRole.teacher)
 
             c.execute(
                 """
@@ -160,12 +161,18 @@ async def create_mark_endp(mark: Marks, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
-        ens.ensure_user_is_role(role, "teacher")
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
         ens.ensure_given_id_is_student(c, mark.user_id)
         ens.ensure_fields_nonnull(mark)
 
-        c.execute(
-            f"""INSERT INTO marks ({gen.format_fields_to_select_sql(gen.get_obj_fields(mark))}) VALUES (%s, %s, %s);""",
-            (mark.user_id, mark.exam_id, mark.value),
-        )
-        conn.commit()
+        try:
+            c.execute(
+                f"""INSERT INTO marks ({gen.format_fields_to_select_sql(gen.get_obj_fields(mark))}) VALUES (%s, %s, %s);""",
+                (mark.user_id, mark.exam_id, mark.value),
+            )
+            conn.commit()
+
+        except errors.UniqueViolation:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="Mark already exists"
+            )
