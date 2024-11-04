@@ -70,7 +70,9 @@ api.include_router(exam_router, prefix="/exam")
 api.include_router(marks_router, prefix="/marks")
 
 
-api.mount("/images/logos", StaticFiles(directory="storage/logos"), name="Static file storage")
+api.mount(
+    "/images/logos", StaticFiles(directory="storage/logos"), name="Static file storage"
+)
 api.include_router(upload_router, prefix="/upload")
 
 

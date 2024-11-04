@@ -31,8 +31,8 @@ CREATE TABLE "student_info" (
 
 
 CREATE TABLE "marks" (
-	"user_id" SERIAL NOT NULL UNIQUE,
-	"exam_id" SERIAL NOT NULL UNIQUE,
+	"user_id" SERIAL NOT NULL,
+	"exam_id" SERIAL NOT NULL,
 	"value" INTEGER NOT NULL,
 	PRIMARY KEY("user_id", "exam_id")
 );

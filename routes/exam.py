@@ -51,7 +51,7 @@ async def delete_exam_endp(id: int, Authorization: str = Header(...)):
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_role(role, "teacher")
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
 
         c.execute("DELETE FROM exams WHERE id=%s;", (id,))
 
@@ -64,7 +64,7 @@ async def edit_exam_endp(id: int | None, exam: Exam, Authorization: str = Header
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_role(role, "teacher")
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
 
         fields = gen.get_obj_fields(Exam)
         c.execute(
@@ -93,7 +93,7 @@ async def create_exam_endp(exam: Exam, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
-        ens.ensure_user_is_role(role, "teacher")
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
         ens.ensure_fields_nonnull(exam)
 
         c.execute(

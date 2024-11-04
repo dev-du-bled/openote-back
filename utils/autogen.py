@@ -15,7 +15,7 @@ def format_fields_to_update_sql(fields: list[str]):
     edit_fields = ",".join(
         list(
             map(
-                lambda n: n + '=%s',
+                lambda n: n + "=%s",
                 fields,
             )
         )

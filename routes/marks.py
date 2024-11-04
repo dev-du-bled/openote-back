@@ -81,7 +81,7 @@ async def delete_mark_endp(
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_role(role, "teacher")
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
 
         c.execute(
             "DELETE FROM marks WHERE user_id=%s AND exam_id=%s;", (user_id, exam_id)
@@ -98,7 +98,7 @@ async def edit_mark_endp(
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_role(role, "teacher")
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
 
         fields = gen.get_obj_fields(Marks)
         c.execute(
