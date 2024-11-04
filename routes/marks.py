@@ -148,12 +148,12 @@ async def edit_mark_endp(
                 detail="No such exam",
             )
 
-        new_data = gen.merge_data(old_data, mark)
+        new_data = gen.merge_data(Marks, old_data, mark)
         print(new_data)
 
         c.execute(
             f"""UPDATE "marks" SET {gen.format_fields_to_update_sql(fields)} WHERE user_id=%s AND exam_id=%s;""",
-            (new_data["user_id"], new_data["exam_id"], new_data["value"]),
+            (new_data + (user_id, exam_id)),
         )
         conn.commit()
 
