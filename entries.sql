@@ -17,6 +17,9 @@ INSERT INTO "student_info" VALUES ( 3, 120457, 1, 1 );
 INSERT INTO "attendance" VALUES ( 0, 0, true, false, '', false );
 INSERT INTO "attendance" VALUES ( 0, 3, true, true, 'puant', false );
 
+INSERT INTO "assigned_homework" VALUES ( 0, 'Finir le TP', '2021-12-12', 2, 'Finir le TP de la semaine 3', 0 );
+INSERT INTO "assigned_homework" VALUES ( 1, 'Finir le TP 2', '2021-12-12', 2, 'Finir le TP de la semaine 4', 1 );
+
 INSERT INTO "exams" VALUES ( 0, 'Système', 20, 1, '2021-12-12' );
 INSERT INTO "exams" VALUES ( 1, 'Réseau', 10, 2, '2021-12-13' );
 INSERT INTO "exams" VALUES ( 2, 'Web', 15, 3, '2021-12-14' );
@@ -24,10 +27,15 @@ INSERT INTO "exams" VALUES ( 3, 'Math', 5, 1, '2021-12-15' );
 INSERT INTO "exams" VALUES ( 4, 'Anglais', 10, 2, '2021-12-16' );
 INSERT INTO "exams" VALUES ( 5, 'Français', 15, 3, '2021-12-17' );
 
-INSERT INTO "marks" VALUES ( 0, 1, 5 );
 INSERT INTO "marks" VALUES ( 3, 0, 15 );
 INSERT INTO "marks" VALUES ( 3, 1, 10 );
 INSERT INTO "marks" VALUES ( 3, 2, 15 );
 INSERT INTO "marks" VALUES ( 3, 3, 5 );
 INSERT INTO "marks" VALUES ( 3, 4, 10 );
 INSERT INTO "marks" VALUES ( 3, 5, 15 );
+INSERT INTO "marks" VALUES ( 0, 0, 15 );
+INSERT INTO "marks" VALUES ( 0, 1, 10 );
+INSERT INTO "marks" VALUES ( 0, 2, 15 );
+INSERT INTO "marks" VALUES ( 0, 3, 5 );
+INSERT INTO "marks" VALUES ( 0, 4, 10 );
+INSERT INTO "marks" VALUES ( 0, 5, 15 );

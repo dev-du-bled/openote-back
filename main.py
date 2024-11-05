@@ -25,7 +25,7 @@ from routes.marks import router as marks_router
 from routes.manage.user import router as manage_user_router
 
 # Homework routes
-# from routes.homework.slash import router as homework_main_router
+from routes.homework.slash import router as homework_main_router
 # from routes.homework.manage import router as homework_manage_router
 # from routes.homework.status import router as homework_status_router
 
@@ -73,7 +73,7 @@ api.include_router(exam_router, prefix="/exam")
 
 api.include_router(marks_router, prefix="/marks")
 
-# api.include_router(homework_main_router, prefix="/homework")
+api.include_router(homework_main_router, prefix="/homework")
 # api.include_router(homework_manage_router, prefix="/homework")
 # api.include_router(homework_status_router, prefix="/homework")
 

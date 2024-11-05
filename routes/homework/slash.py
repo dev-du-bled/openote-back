@@ -10,26 +10,27 @@ from db import get_db_connection
 router = APIRouter()
 
 
-class Homework(BaseModel):
-    title: str | None
-    due_date: str | None
-    author: int | None
-    details: str | None
-
-
 @router.get("/", name="Get homeworks")
 async def get_homework_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        role = ens.get_role_from_token(c, Authorization)
+        query = """
+        SELECT
+          h.title as homework_title,
+          h.due_date as homework_due_date,
+          h.details as homework_details,
+          u.firstname as author_first_name,
+          u.lastname as author_last_name
+        FROM assigned_homework h
+        JOIN "user" u ON h.author = u.id
+        """
 
-        fields = gen.get_obj_fields(Homework)
-        selected_fields = gen.format_fields_to_select_sql(fields)
+        if id is None:
+            query += f"WHERE h.id = {id}"
 
-        c.execute(
-            f"""SELECT {selected_fields} FROM homework WHERE id=%s;""",
-            (id,),
-        )
+        query += ";"
+
+        c.execute(query)
         res = c.fetchone()
 
         if res is None:
