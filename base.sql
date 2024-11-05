@@ -1,7 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 GRANT USAGE ON SCHEMA cron TO openuser;
 
-
 CREATE TYPE "role" AS ENUM (
 	'parent',
 	'student',
@@ -83,8 +82,8 @@ CREATE TABLE "assigned_homework" (
 
 
 CREATE TABLE "homework_status" (
-	"homework" INTEGER NOT NULL UNIQUE,
-	"student" INTEGER NOT NULL UNIQUE,
+	"homework" INTEGER NOT NULL,
+	"student" INTEGER NOT NULL,
 	"is_done" BOOLEAN NOT NULL,
 	PRIMARY KEY("homework", "student")
 );
@@ -105,7 +104,14 @@ CREATE TABLE "exams" (
 	"max_mark" SMALLINT NOT NULL,
 	"coefficient" DECIMAL DEFAULT 1,
 	"date" DATE,
+	"unit" VARCHAR(50) NOT NULL,
 	PRIMARY KEY("id")
+);
+
+
+CREATE TABLE "unit" (
+	"title" VARCHAR(50) NOT NULL UNIQUE,
+	PRIMARY KEY("title")
 );
 
 
@@ -145,5 +151,8 @@ ON UPDATE NO ACTION ON DELETE NO ACTION;
 ALTER TABLE "marks"
 ADD FOREIGN KEY("exam_id") REFERENCES "exams"("id")
 ON UPDATE NO ACTION ON DELETE CASCADE;
+ALTER TABLE "exams"
+ADD FOREIGN KEY("unit") REFERENCES "unit"("title")
+ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 SELECT cron.schedule('0 00 * * *', $$DELETE FROM sessions WHERE DATE_PART('EPOCH', expires_at) < (SELECT DATE_PART('EPOCH', CURRENT_TIMESTAMP));$$);
