@@ -16,6 +16,12 @@ async def get_homework_endp(
         role = ens.get_role_from_token(c, Authorization)
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
+        if id is not None and max_homework:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You cannot provide both id and max_homework",
+            )
+
         if role == ens.UserRole.teacher:
             query = """
             SELECT
@@ -36,7 +42,7 @@ async def get_homework_endp(
                 query += f"WHERE h.id = {id};"
             else:
                 if max_homework:
-                    query += "ORDER BY completed_count ASC "
+                    query += "ORDER BY h.due_date ASC "
                     query += "LIMIT 5"
 
             query += ";"
