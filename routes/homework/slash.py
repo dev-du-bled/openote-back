@@ -68,7 +68,7 @@ async def get_homework_endp(
                 query += f"AND h.id = {id}"
             else:
                 if max_homework:
-                    query += "ORDER BY h.due_date ASC "
+                    query += "ORDER BY h.id, h.due_date ASC "
                     query += "LIMIT 5"
 
             query += ";"
