@@ -11,7 +11,7 @@ from db import get_db_connection
 class LoginCred(BaseModel):
     email: str
     password: str
-    extended_period:bool
+    extended_period: bool
 
 
 router = APIRouter()
@@ -36,12 +36,11 @@ async def login_endp(creds: LoginCred):
 
         now = dt.now()
         session_token = hs.md5((res[1] + str(now)).encode()).hexdigest()
-        expiration = now + td(days=1+5*int(creds.extended_period))
+        expiration = now + td(days=1 + 5 * int(creds.extended_period))
 
-        # TODO: support extended time
         c.execute(
             """INSERT INTO sessions VALUES (%s, %s, %s, %s);""",
-            (session_token, res[0], expiration, False),
+            (session_token, res[0], expiration, creds.extended_period),
         )
         conn.commit()
 
