@@ -40,7 +40,7 @@ async def get_marks_endp(
                 query += f"WHERE m.user_id = {role_id} "
 
             if max_mark:
-                query += "ORDER BY e.date DESC "
+                query += "ORDER BY e.date ASC "
                 query += "LIMIT 5"
 
             query += ";"
@@ -74,7 +74,7 @@ async def get_marks_endp(
             """
 
             if max_mark:
-                query += "ORDER BY e.date DESC "
+                query += "ORDER BY e.date ASC "
                 query += "LIMIT 5"
 
             query += ";"
@@ -110,7 +110,7 @@ async def get_marks_endp(
             """
 
             if max_mark:
-                query += "ORDER BY e.date DESC "
+                query += "ORDER BY e.date ASC "
                 query += "LIMIT 5"
 
             query += ";"
