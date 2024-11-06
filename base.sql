@@ -1,7 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 GRANT USAGE ON SCHEMA cron TO openuser;
 
-
 CREATE TYPE "role" AS ENUM (
 	'parent',
 	'student',
@@ -83,8 +82,8 @@ CREATE TABLE "assigned_homework" (
 
 
 CREATE TABLE "homework_status" (
-	"homework" INTEGER NOT NULL UNIQUE,
-	"student" INTEGER NOT NULL UNIQUE,
+	"homework" INTEGER NOT NULL,
+	"student" INTEGER NOT NULL,
 	"is_done" BOOLEAN NOT NULL,
 	PRIMARY KEY("homework", "student")
 );

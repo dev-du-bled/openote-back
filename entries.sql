@@ -11,14 +11,50 @@ INSERT INTO "group" VALUES ( 0, 'BUT_1_APP' );
 INSERT INTO "group" VALUES ( 1, 'BUT_1_1' );
 INSERT INTO "group" VALUES ( 2, 'BUT_1_2' );
 
-INSERT INTO "student_info" VALUES ( 0, 123456, 1, 1 );
+INSERT INTO "unit" VALUES ( 'UE 1' );
+INSERT INTO "unit" VALUES ( 'UE 2' );
+INSERT INTO "unit" VALUES ( 'UE 3' );
+INSERT INTO "unit" VALUES ( 'UE 4' );
+INSERT INTO "unit" VALUES ( 'UE 5' );
+
+INSERT INTO "student_info" VALUES ( 0, 123456, 0, 1 );
 INSERT INTO "student_info" VALUES ( 3, 120457, 1, 1 );
 
 INSERT INTO "attendance" VALUES ( 0, 0, true, false, '', false );
 INSERT INTO "attendance" VALUES ( 0, 3, true, true, 'puant', false );
 
-INSERT INTO "exams" VALUES ( 0, 'Système', 20, 1, '2021-12-12' );
-INSERT INTO "exams" VALUES ( 1, 'Réseau', 10, 2, '2021-12-13' );
+INSERT INTO "assigned_homework" VALUES ( 0, 'Finir le TP 1', '2021-12-12', 2, 'Finir le TP de la semaine 3', 0 );
+INSERT INTO "assigned_homework" VALUES ( 1, 'Finir le TP 2', '2021-12-12', 2, 'Finir le TP de la semaine 4', 1 );
+INSERT INTO "assigned_homework" VALUES ( 2, 'Finir le TP 3', '2021-12-14', 2, 'Finir le TP de la semaine 5', 0 );
+INSERT INTO "assigned_homework" VALUES ( 3, 'Finir le TP 4', '2021-12-15', 2, 'Finir le TP de la semaine 6', 0 );
+INSERT INTO "assigned_homework" VALUES ( 4, 'Finir le TP 5', '2021-12-16', 2, 'Finir le TP de la semaine 7', 0 );
+INSERT INTO "assigned_homework" VALUES ( 5, 'Finir le TP 6', '2021-12-17', 2, 'Finir le TP de la semaine 8', 0 );
+INSERT INTO "assigned_homework" VALUES ( 6, 'Finir le TP 7', '2021-12-18', 2, 'Finir le TP de la semaine 9', 0 );
+
+INSERT INTO "homework_status" VALUES ( 0, 0, false );
+INSERT INTO "homework_status" VALUES ( 1, 3, true );
+INSERT INTO "homework_status" VALUES ( 2, 0, true );
+INSERT INTO "homework_status" VALUES ( 3, 0, true );
+INSERT INTO "homework_status" VALUES ( 4, 0, true );
+INSERT INTO "homework_status" VALUES ( 5, 0, true );
+INSERT INTO "homework_status" VALUES ( 6, 0, true );
+
+INSERT INTO "exams" VALUES ( 0, 'Système', 20, 1, '2021-12-12', 'UE 1');
+INSERT INTO "exams" VALUES ( 1, 'Réseau', 10, 2, '2021-12-13', 'UE 2');
+INSERT INTO "exams" VALUES ( 2, 'Web', 15, 3, '2021-12-14', 'UE 3');
+INSERT INTO "exams" VALUES ( 3, 'Math', 5, 1, '2021-12-15', 'UE 4');
+INSERT INTO "exams" VALUES ( 4, 'Anglais', 10, 2, '2021-12-16', 'UE 5');
+INSERT INTO "exams" VALUES ( 5, 'Français', 15, 3, '2021-12-17', 'UE 5');
 
 INSERT INTO "marks" VALUES ( 3, 0, 15 );
-INSERT INTO "marks" VALUES ( 0, 1, 5 );
+INSERT INTO "marks" VALUES ( 3, 1, 10 );
+INSERT INTO "marks" VALUES ( 3, 2, 15 );
+INSERT INTO "marks" VALUES ( 3, 3, 5 );
+INSERT INTO "marks" VALUES ( 3, 4, 10 );
+INSERT INTO "marks" VALUES ( 3, 5, 15 );
+INSERT INTO "marks" VALUES ( 0, 0, 15 );
+INSERT INTO "marks" VALUES ( 0, 1, 10 );
+INSERT INTO "marks" VALUES ( 0, 2, 15 );
+INSERT INTO "marks" VALUES ( 0, 3, 5 );
+INSERT INTO "marks" VALUES ( 0, 4, 10 );
+INSERT INTO "marks" VALUES ( 0, 5, 15 );

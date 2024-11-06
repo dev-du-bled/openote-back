@@ -21,6 +21,7 @@ async def get_marks_endp(
     Authorization: str = Header(...),
     user_id: int | None = None,
     exam_id: int | None = None,
+    max_mark: bool = False,
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -30,14 +31,22 @@ async def get_marks_endp(
             ens.ensure_user_is_role(role, ens.UserRole.student)
             role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
-            c.execute(
-                """
-                SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
-                FROM marks m JOIN exams e ON m.exam_id = e.id
-                WHERE m.user_id = %s;
-                """,
-                (role_id,),
-            )
+            query = """
+            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
+            FROM marks m JOIN exams e ON m.exam_id = e.id
+            """
+
+            if ens.get_user_col_from_token(c, "role", Authorization) == "student":
+                query += f"WHERE m.user_id = {role_id} "
+
+            if max_mark:
+                query += "ORDER BY e.date ASC "
+                query += "LIMIT 5"
+
+            query += ";"
+
+            c.execute(query)
+
             res = c.fetchall()
 
         elif user_id is not None and exam_id is not None:
@@ -58,44 +67,55 @@ async def get_marks_endp(
             ens.ensure_user_is_role(role, ens.UserRole.teacher)
             ens.ensure_given_id_is_student(c, user_id)
 
-            c.execute(
-                """
-                SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
-                FROM marks m JOIN exams e ON m.exam_id = e.id
-                WHERE m.user_id = %s;
-                """,
-                (user_id,),
-            )
+            query = """
+            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
+            FROM marks m JOIN exams e ON m.exam_id = e.id
+            WHERE m.user_id = %s
+            """
+
+            if max_mark:
+                query += "ORDER BY e.date ASC "
+                query += "LIMIT 5"
+
+            query += ";"
+
+            c.execute(query, (user_id,))
+
             res = c.fetchall()
 
         elif exam_id is not None:
             ens.ensure_user_is_role(role, ens.UserRole.teacher)
 
-            c.execute(
-                """
-                SELECT
-                  m.value AS mark_value,
-                  e.title AS exam_title,
-                  e.max_mark AS exam_max_mark,
-                  e.coefficient AS exam_coefficient,
-                  e.date AS exam_date,
-                  u.firstname AS user_firstname,
-                  u.lastname AS user_lastname,
-                  s.class AS student_class,
-                  s.group AS student_group
-                FROM
-                    marks m
-                JOIN
-                    exams e ON m.exam_id = e.id
-                JOIN
-                    student_info s ON m.user_id = s.user_id
-                JOIN
-                    "user" u ON s.user_id = u.id
-                WHERE
-                    m.exam_id = %s;
-                """,
-                (exam_id,),
-            )
+            query = """
+            SELECT
+              m.value AS mark_value,
+              e.title AS exam_title,
+              e.max_mark AS exam_max_mark,
+              e.coefficient AS exam_coefficient,
+              e.date AS exam_date,
+              u.firstname AS user_firstname,
+              u.lastname AS user_lastname,
+              s.class AS student_class,
+              s.group AS student_group
+            FROM
+                marks m
+            JOIN
+                exams e ON m.exam_id = e.id
+            JOIN
+                student_info s ON m.user_id = s.user_id
+            JOIN
+                "user" u ON s.user_id = u.id
+            WHERE
+                m.exam_id = %s
+            """
+
+            if max_mark:
+                query += "ORDER BY e.date ASC "
+                query += "LIMIT 5"
+
+            query += ";"
+
+            c.execute(query, (exam_id,))
             res = c.fetchall()
 
         if res is None:

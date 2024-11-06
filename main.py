@@ -11,7 +11,6 @@ from routes.attendance.lates import router as attendance_lates_router
 from routes.attendance.slash import router as attendance_main_router
 
 # Auth routes
-from routes import upload
 from routes.auth.login import router as auth_login_router
 from routes.auth.logout import router as auth_logout_router
 
@@ -19,11 +18,17 @@ from routes.auth.logout import router as auth_logout_router
 from routes.exam import router as exam_router
 from routes.manage.collection import router as manage_collection_router
 
+# Marks route
+from routes.marks import router as marks_router
+
 # Manage routes
 from routes.manage.user import router as manage_user_router
 
-# Marks route
-from routes.marks import router as marks_router
+# Homework routes
+from routes.homework.slash import router as homework_main_router
+
+# from routes.homework.manage import router as homework_manage_router
+from routes.homework.status import router as homework_status_router
 
 # Planning route
 from routes.planning import router as planning_router
@@ -73,6 +78,10 @@ api.include_router(exam_router, prefix="/exam")
 api.include_router(marks_router, prefix="/marks")
 
 api.include_router(units_router, prefix="/units")
+
+api.include_router(homework_main_router, prefix="/homework")
+# api.include_router(homework_manage_router, prefix="/homework")
+api.include_router(homework_status_router, prefix="/homework")
 
 api.mount(
     "/images/logos", StaticFiles(directory="storage/logos"), name="Static file storage"
