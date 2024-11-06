@@ -3,7 +3,6 @@ from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
-import utils.autogen as gen
 import utils.ensurances as ens
 from db import get_db_connection
 
@@ -54,7 +53,7 @@ async def update_unit_endp(update_data: UpdateUnit, Authorization: str = Header(
         conn.commit()
 
 
-@router.patch("/", name="Create unit", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/", name="Create unit", status_code=status.HTTP_204_NO_CONTENT)
 async def create_unit_endp(update_data: Unit, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:

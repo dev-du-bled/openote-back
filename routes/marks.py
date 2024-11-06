@@ -13,8 +13,8 @@ router = APIRouter()
 class Marks(BaseModel):
     user_id: int | None
     exam_id: int | None
-    value: int   | None
-    unit: str    | None
+    value: int | None
+    unit: str | None
 
 
 @router.get("", name="List marks")
@@ -186,7 +186,7 @@ async def create_mark_endp(mark: Marks, Authorization: str = Header(...)):
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_role(role, ens.UserRole.teacher)
-        ens.ensure_given_id_is_student(c, mark.user_id) # pyright: ignore
+        ens.ensure_given_id_is_student(c, mark.user_id)  # pyright: ignore
 
         try:
             c.execute(
