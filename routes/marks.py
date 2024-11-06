@@ -11,9 +11,10 @@ router = APIRouter()
 
 
 class Marks(BaseModel):
-    user_id: int
-    exam_id: int
-    value: int
+    user_id: int | None
+    exam_id: int | None
+    value: int   | None
+    unit: str    | None
 
 
 @router.get("", name="List marks")
@@ -32,7 +33,7 @@ async def get_marks_endp(
             role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
             query = """
-            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
+            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
             FROM marks m JOIN exams e ON m.exam_id = e.id
             """
 
@@ -55,7 +56,7 @@ async def get_marks_endp(
 
             c.execute(
                 """
-                SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
+                SELECT m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
                 FROM marks m JOIN exams e ON m.exam_id = e.id
                 WHERE m.user_id = %s AND m.exam_id = %s;
                 """,
@@ -68,7 +69,7 @@ async def get_marks_endp(
             ens.ensure_given_id_is_student(c, user_id)
 
             query = """
-            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date
+            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
             FROM marks m JOIN exams e ON m.exam_id = e.id
             WHERE m.user_id = %s
             """
@@ -93,6 +94,7 @@ async def get_marks_endp(
               e.max_mark AS exam_max_mark,
               e.coefficient AS exam_coefficient,
               e.date AS exam_date,
+              e.unit AS exam_unit,
               u.firstname AS user_firstname,
               u.lastname AS user_lastname,
               s.class AS student_class,
@@ -179,11 +181,12 @@ async def edit_mark_endp(
 @router.post("/manage", name="Create a mark", status_code=status.HTTP_204_NO_CONTENT)
 async def create_mark_endp(mark: Marks, Authorization: str = Header(...)):
     conn = get_db_connection()
+    ens.ensure_fields_nonnull(mark)
+
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_role(role, ens.UserRole.teacher)
-        ens.ensure_given_id_is_student(c, mark.user_id)
-        ens.ensure_fields_nonnull(mark)
+        ens.ensure_given_id_is_student(c, mark.user_id) # pyright: ignore
 
         try:
             c.execute(
