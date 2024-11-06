@@ -38,17 +38,6 @@ async def get_homework_endp(
             GROUP BY h.id, u.firstname, u.lastname, c.name
             """
 
-            if id is not None:
-                query += f"WHERE h.id = {id};"
-            else:
-                if max_homework:
-                    query += "ORDER BY h.due_date ASC "
-                    query += "LIMIT 5"
-
-            query += ";"
-
-            c.execute(query)
-
         elif role == ens.UserRole.student:
             query = """
             SELECT DISTINCT ON (h.id)
@@ -64,16 +53,16 @@ async def get_homework_endp(
               AND h.assigned_class = (SELECT class FROM student_info WHERE user_id = %s)
             """
 
-            if id is not None:
-                query += f"AND h.id = {id}"
-            else:
-                if max_homework:
-                    query += "ORDER BY h.id, h.due_date ASC "
-                    query += "LIMIT 5"
+        if id is not None:
+            query += f"AND h.id = {id}"
+        else:
+            if max_homework:
+                query += "ORDER BY h.id, h.due_date ASC "
+                query += "LIMIT 5"
 
-            query += ";"
+        query += ";"
 
-            c.execute(query, (role_id, role_id))
+        c.execute(query) if id is not None else c.execute(query, (role_id, role_id))
 
         res = c.fetchone() if id is not None else c.fetchall()
 
