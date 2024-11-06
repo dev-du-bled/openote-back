@@ -21,7 +21,7 @@ async def get_marks_endp(
     Authorization: str = Header(...),
     user_id: int | None = None,
     exam_id: int | None = None,
-    max_mark: bool = False,
+    max_mark: int | None = None,
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -39,9 +39,9 @@ async def get_marks_endp(
             if ens.get_user_col_from_token(c, "role", Authorization) == "student":
                 query += f"WHERE m.user_id = {role_id} "
 
-            if max_mark:
+            if max_mark is not None:
                 query += "ORDER BY e.date ASC "
-                query += "LIMIT 5"
+                query += f"LIMIT {max_mark} "
 
             query += ";"
 
@@ -73,9 +73,9 @@ async def get_marks_endp(
             WHERE m.user_id = %s
             """
 
-            if max_mark:
+            if max_mark is not None:
                 query += "ORDER BY e.date ASC "
-                query += "LIMIT 5"
+                query += f"LIMIT {max_mark} "
 
             query += ";"
 
@@ -109,9 +109,9 @@ async def get_marks_endp(
                 m.exam_id = %s
             """
 
-            if max_mark:
+            if max_mark is not None:
                 query += "ORDER BY e.date ASC "
-                query += "LIMIT 5"
+                query += f"LIMIT {max_mark} "
 
             query += ";"
 
