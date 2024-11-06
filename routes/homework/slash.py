@@ -9,7 +9,9 @@ router = APIRouter()
 
 @router.get("/", name="Get homeworks")
 async def get_homework_endp(
-    Authorization: str = Header(...), id: int | None = None, max_homework: bool = False
+    Authorization: str = Header(...),
+    id: int | None = None,
+    max_homework: int | None = None,
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -56,9 +58,9 @@ async def get_homework_endp(
         if id is not None:
             query += f"AND h.id = {id}"
         else:
-            if max_homework:
+            if max_homework is not None:
                 query += "ORDER BY h.id, h.due_date ASC "
-                query += "LIMIT 5"
+                query += f"LIMIT {max_homework}"
 
         query += ";"
 
