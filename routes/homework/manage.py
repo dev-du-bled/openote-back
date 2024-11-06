@@ -43,3 +43,20 @@ async def get_homework_endp(homework: Homework, Authorization: str = Header(...)
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="Homework already exists"
             )
+
+
+@router.delete(
+    "/manage", name="Delete a homework", status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_homework_endp(id: int, Authorization: str = Header(...)):
+    conn = get_db_connection()
+    with conn.cursor(cursor_factory=RealDictCursor) as c:
+        role = ens.get_role_from_token(c, Authorization)
+
+        ens.ensure_user_is_role(role, ens.UserRole.teacher)
+
+        c.execute("DELETE FROM homework_status WHERE homework=%s;", (id,))
+
+        c.execute("DELETE FROM assigned_homework WHERE id=%s;", (id,))
+
+        conn.commit()
