@@ -31,6 +31,9 @@ from routes.planning import router as planning_router
 # User route
 from routes.user import router as user_router
 
+# units route
+from routes.units import router as units_router
+
 # Upload route
 from routes.upload import router as upload_router
 
@@ -69,6 +72,7 @@ api.include_router(exam_router, prefix="/exam")
 
 api.include_router(marks_router, prefix="/marks")
 
+api.include_router(units_router, prefix="/units")
 
 api.mount(
     "/images/logos", StaticFiles(directory="storage/logos"), name="Static file storage"
