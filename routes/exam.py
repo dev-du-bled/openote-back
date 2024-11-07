@@ -89,7 +89,7 @@ async def edit_exam_endp(id: int | None, exam: Exam, Authorization: str = Header
 
 
 @router.post("/manage", name="Create an exam", status_code=status.HTTP_204_NO_CONTENT)
-async def create_exam_endp(exam: Exam, Authorization: str = Header(...)):
+async def add_exam_endp(exam: Exam, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -97,7 +97,11 @@ async def create_exam_endp(exam: Exam, Authorization: str = Header(...)):
         ens.ensure_fields_nonnull(exam)
 
         c.execute(
-            f"""INSERT INTO exams ({gen.format_fields_to_select_sql(gen.get_obj_fields(Exam))}) VALUES (%s, %s, %s, %s)""",
+            f"""
+            INSERT INTO
+              exams ({gen.format_fields_to_select_sql(gen.get_obj_fields(Exam))})
+            VALUES
+              (%s, %s, %s, %s)""",
             (exam.title, exam.max_mark, exam.coefficient, exam.date),
         )
         conn.commit()

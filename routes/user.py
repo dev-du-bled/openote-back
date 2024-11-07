@@ -25,7 +25,8 @@ async def get_user_endp(Authorization: str = Header(...)):
 
         if role == "student":
             c.execute(
-                """SELECT
+                """
+                SELECT
                   u.lastname,
                   u.firstname,
                   u.pronouns,
@@ -34,18 +35,25 @@ async def get_user_endp(Authorization: str = Header(...)):
                   u.profile_picture,
                   s.group,
                   s.class
-              FROM
+                FROM
                   "user" u
-              LEFT JOIN
+                LEFT JOIN
                   student_info s ON u.id = s.user_id
-              WHERE
+                WHERE
                   u.id = (SELECT associated_user FROM sessions WHERE token = %s);
-                  """,
+                """,
                 (Authorization,),
             )
         else:
             c.execute(
-                """SELECT lastname, firstname, pronouns, email, role, profile_picture FROM "user" WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
+                """
+                SELECT
+                  lastname, firstname, pronouns, email, role, profile_picture
+                FROM
+                  "user"
+                WHERE
+                  id=(SELECT associated_user FROM sessions WHERE token=%s);
+                """,
                 (Authorization,),
             )
 
@@ -58,7 +66,7 @@ async def get_user_endp(Authorization: str = Header(...)):
 
 
 @router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
-async def update_user_endp(user_data: UpdateUserData, Authorization: str = Header(...)):
+async def edit_user_endp(user_data: UpdateUserData, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
@@ -67,14 +75,28 @@ async def update_user_endp(user_data: UpdateUserData, Authorization: str = Heade
         selected_fields = gen.format_fields_to_select_sql(fields)
 
         c.execute(
-            f"""SELECT {selected_fields} FROM "user" WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
+            f"""
+            SELECT
+              {selected_fields}
+            FROM
+              "user"
+            WHERE
+              id=(SELECT associated_user FROM sessions WHERE token=%s);
+            """,
             (Authorization,),
         )
         old_data = c.fetchone()
         new_data = gen.merge_data(UpdateUserData, old_data, user_data)
 
         c.execute(
-            f"""UPDATE "user" SET {gen.format_fields_to_update_sql(fields)} WHERE id=(SELECT associated_user FROM sessions WHERE token=%s);""",
+            f"""
+            UPDATE
+              "user"
+            SET
+              {gen.format_fields_to_update_sql(fields)}
+            WHERE
+              id=(SELECT associated_user FROM sessions WHERE token=%s);
+            """,
             (
                 new_data[0],
                 new_data[1],

@@ -25,6 +25,7 @@ async def login_endp(creds: LoginCred):
             """SELECT id,password_hash FROM "user" WHERE email=%s;""", (creds.email,)
         )
         res = c.fetchone()
+
         if res is None:
             raise HTTPException(status_code=404, detail="No such user !")
 

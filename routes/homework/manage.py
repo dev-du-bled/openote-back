@@ -18,7 +18,7 @@ class Homework(BaseModel):
 
 
 @router.post("/manage", name="Create a homework", status_code=status.HTTP_201_CREATED)
-async def get_homework_endp(homework: Homework, Authorization: str = Header(...)):
+async def add_homework_endp(homework: Homework, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -28,7 +28,11 @@ async def get_homework_endp(homework: Homework, Authorization: str = Header(...)
 
         try:
             c.execute(
-                """INSERT INTO assigned_homework (title, due_date, author, details, assigned_class) VALUES (%s, %s, %s, %s, %s);""",
+                """
+                INSERT INTO
+                  assigned_homework (title, due_date, author, details, assigned_class)
+                VALUES
+                  (%s, %s, %s, %s, %s);""",
                 (
                     homework.title,
                     homework.due_date,
@@ -66,7 +70,7 @@ async def delete_homework_endp(id: int, Authorization: str = Header(...)):
 @router.patch(
     "/manage", name="Update a homework", status_code=status.HTTP_204_NO_CONTENT
 )
-async def update_homework_endp(
+async def edit_homework_endp(
     id: int, homework: Homework, Authorization: str = Header(...)
 ):
     conn = get_db_connection()

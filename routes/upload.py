@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Header, status, UploadFile, Request
-from psycopg2.extras import RealDictCursor
-from PIL import Image
 from io import BytesIO
+
+from fastapi import APIRouter, Header, Request, UploadFile, status
+from PIL import Image
+from psycopg2.extras import RealDictCursor
 
 import utils.ensurances as ens
 from db import get_db_connection

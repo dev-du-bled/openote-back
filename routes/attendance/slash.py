@@ -50,7 +50,7 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
 
 
 @router.post("", name="Add attendance", status_code=status.HTTP_204_NO_CONTENT)
-async def post_attendance_endp(att: Attendance, Authorization: str = Header(...)):
+async def add_attendance_endp(att: Attendance, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)

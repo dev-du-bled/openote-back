@@ -20,7 +20,7 @@ router = APIRouter()
 
 
 @router.get("/", name="List units")
-async def get_units_endp(Authorization: str = Header(...)):
+async def get_unit_endp(Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
@@ -33,7 +33,7 @@ async def get_units_endp(Authorization: str = Header(...)):
 
 
 @router.patch("/", name="Update unit", status_code=status.HTTP_204_NO_CONTENT)
-async def update_unit_endp(update_data: UpdateUnit, Authorization: str = Header(...)):
+async def edit_unit_endp(update_data: UpdateUnit, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -54,7 +54,7 @@ async def update_unit_endp(update_data: UpdateUnit, Authorization: str = Header(
 
 
 @router.post("/", name="Create unit", status_code=status.HTTP_204_NO_CONTENT)
-async def create_unit_endp(update_data: Unit, Authorization: str = Header(...)):
+async def add_unit_endp(update_data: Unit, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -62,6 +62,7 @@ async def create_unit_endp(update_data: Unit, Authorization: str = Header(...)):
 
         try:
             c.execute("""INSERT INTO "unit" VALUES (%s)""", (update_data.title,))
+
         except errors.UniqueViolation:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

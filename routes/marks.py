@@ -18,7 +18,7 @@ class Marks(BaseModel):
 
 
 @router.get("", name="List marks")
-async def get_marks_endp(
+async def get_mark_endp(
     Authorization: str = Header(...),
     user_id: int | None = None,
     exam_id: int | None = None,
@@ -33,8 +33,12 @@ async def get_marks_endp(
             role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
             query = """
-            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
-            FROM marks m JOIN exams e ON m.exam_id = e.id
+            SELECT
+              m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
+            FROM
+              marks m
+            JOIN
+              exams e ON m.exam_id = e.id
             """
 
             if ens.get_user_col_from_token(c, "role", Authorization) == "student":
@@ -56,9 +60,14 @@ async def get_marks_endp(
 
             c.execute(
                 """
-                SELECT m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
-                FROM marks m JOIN exams e ON m.exam_id = e.id
-                WHERE m.user_id = %s AND m.exam_id = %s;
+                SELECT
+                  m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
+                FROM
+                  marks m
+                JOIN
+                  exams e ON m.exam_id = e.id
+                WHERE
+                  m.user_id = %s AND m.exam_id = %s;
                 """,
                 (user_id, exam_id),
             )
@@ -158,7 +167,13 @@ async def edit_mark_endp(
 
         fields = gen.get_obj_fields(Marks)
         c.execute(
-            f"SELECT {gen.format_fields_to_select_sql(fields)} FROM marks WHERE user_id=%s AND exam_id=%s;",
+            f"""
+            SELECT
+              {gen.format_fields_to_select_sql(fields)}
+            FROM
+              marks
+            WHERE
+              user_id=%s AND exam_id=%s;""",
             (user_id, exam_id),
         )
         old_data = c.fetchone()
@@ -172,14 +187,20 @@ async def edit_mark_endp(
         print(new_data)
 
         c.execute(
-            f"""UPDATE "marks" SET {gen.format_fields_to_update_sql(fields)} WHERE user_id=%s AND exam_id=%s;""",
+            f"""
+            UPDATE
+              "marks"
+            SET
+              {gen.format_fields_to_update_sql(fields)}
+            WHERE
+              user_id=%s AND exam_id=%s;""",
             (new_data + (user_id, exam_id)),
         )
         conn.commit()
 
 
 @router.post("/manage", name="Create a mark", status_code=status.HTTP_204_NO_CONTENT)
-async def create_mark_endp(mark: Marks, Authorization: str = Header(...)):
+async def add_mark_endp(mark: Marks, Authorization: str = Header(...)):
     conn = get_db_connection()
     ens.ensure_fields_nonnull(mark)
 
@@ -190,7 +211,11 @@ async def create_mark_endp(mark: Marks, Authorization: str = Header(...)):
 
         try:
             c.execute(
-                f"""INSERT INTO marks ({gen.format_fields_to_select_sql(gen.get_obj_fields(mark))}) VALUES (%s, %s, %s);""",
+                f"""
+                INSERT INTO
+                  marks ({gen.format_fields_to_select_sql(gen.get_obj_fields(mark))})
+                VALUES
+                  (%s, %s, %s);""",
                 (mark.user_id, mark.exam_id, mark.value),
             )
             conn.commit()

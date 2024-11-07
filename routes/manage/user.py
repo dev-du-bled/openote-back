@@ -59,7 +59,7 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
 
 
 @router.post("/user", name="Add user", status_code=status.HTTP_201_CREATED)
-async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
+async def add_user_endp(ud: AddUserData, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -67,7 +67,14 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
         ens.ensure_user_is_admin(role)
 
         try:
-            query = """INSERT INTO "user" (lastname, firstname, pronouns, email, password_hash, role, profile_picture) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;"""
+            query = """
+            INSERT INTO
+              "user" (lastname, firstname, pronouns, email, password_hash, role, profile_picture)
+            VALUES
+              (%s, %s, %s, %s, %s, %s, %s)
+            RETURNING id;
+            """
+
             values = [
                 ud.lastname,
                 ud.firstname,
@@ -82,11 +89,19 @@ async def post_user_endp(ud: AddUserData, Authorization: str = Header(...)):
             user_id = c.fetchone()["id"]
 
             if ud.role == "student":
-                student_query = """INSERT INTO "student_info" (user_id, student_number, class, "group") VALUES (%s, %s, %s, %s);"""
+                student_query = """
+                INSERT INTO
+                  "student_info" (user_id, student_number, class, "group")
+                VALUES
+                  (%s, %s, %s, %s);
+                """
+
                 student_values = [user_id, ud.student_number, ud.class_, ud.group]
+
                 c.execute(student_query, student_values)
 
             conn.commit()
+
         except errors.UniqueViolation:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="User already exists"
@@ -122,7 +137,7 @@ async def delete_user_endp(Authorization: str = Header(...), id: int = None):
 
 
 @router.patch("/user", name="Edit user", status_code=status.HTTP_204_NO_CONTENT)
-async def update_usr_endp(
+async def edit_usr_endp(
     user_data: UpdateUserData, Authorization: str = Header(...), id: int = None
 ):
     conn = get_db_connection()
@@ -135,7 +150,16 @@ async def update_usr_endp(
         selected_fields = gen.format_fields_to_select_sql(fields)
 
         c.execute(
-            f"""SELECT {selected_fields} FROM "user" LEFT OUTER JOIN student_info ON student_info.user_id="user".id  WHERE "user".id=%s;""",
+            f"""
+            SELECT
+              {selected_fields}
+            FROM
+              "user"
+            LEFT OUTER JOIN
+              student_info ON student_info.user_id="user".id
+            WHERE
+              "user".id=%s;
+            """,
             (id,),
         )
 

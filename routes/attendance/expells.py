@@ -16,7 +16,7 @@ class Expell(BaseModel):
 
 
 @router.get("/expells", name="Get expells")
-async def get_expells_endp(Authorization: str = Header(...), id: int | None = None):
+async def get_expell_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -49,7 +49,7 @@ async def get_expells_endp(Authorization: str = Header(...), id: int | None = No
 
 
 @router.post("/expells", name="Add expell", status_code=status.HTTP_204_NO_CONTENT)
-async def post_expells_endp(exp: Expell, Authorization: str = Header(...)):
+async def add_expell_endp(exp: Expell, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -76,7 +76,13 @@ async def post_expells_endp(exp: Expell, Authorization: str = Header(...)):
             )
 
         c.execute(
-            """UPDATE attendance SET expelled=True, expel_reason=%s WHERE class_id=%s AND student_id=%s;""",
+            """
+            UPDATE
+              attendance
+            SET
+              expelled=True, expel_reason=%s
+            WHERE
+              class_id=%s AND student_id=%s;""",
             (exp.expel_reason, exp.class_id, exp.student_id),
         )
 

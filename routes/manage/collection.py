@@ -40,7 +40,7 @@ async def get_collection_endp(
 
 
 @router.post("/{type}", name="Add collection", status_code=status.HTTP_204_NO_CONTENT)
-async def post_collection_endp(
+async def add_collection_endp(
     ce: Element, Authorization: str = Header(...), type: str = None
 ):
     conn = get_db_connection()
@@ -99,7 +99,7 @@ async def delete_collection_endp(
 
 
 @router.patch("/{type}", name="Edit collection", status_code=status.HTTP_204_NO_CONTENT)
-async def update_collection_endp(
+async def edit_collection_endp(
     pe: Element, Authorization: str = Header(...), type: str = None, id: int = None
 ):
     conn = get_db_connection()

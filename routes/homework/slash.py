@@ -33,25 +33,34 @@ async def get_homework_endp(
               u.firstname || ' ' || u.lastname AS author_name,
               c.name as class_name,
               COUNT(CASE WHEN s.is_done = true THEN 1 END) AS completed_count
-            FROM assigned_homework h
-            JOIN "user" u ON h.author = u.id
-            JOIN class c ON h.assigned_class = c.id
-            LEFT JOIN homework_status s ON s.homework = h.id
-            GROUP BY h.id, u.firstname, u.lastname, c.name
+            FROM
+              assigned_homework h
+            JOIN
+              "user" u ON h.author = u.id
+            JOIN
+              class c ON h.assigned_class = c.id
+            LEFT JOIN
+              homework_status s ON s.homework = h.id
+            GROUP BY
+              h.id, u.firstname, u.lastname, c.name
             """
 
         elif role == ens.UserRole.student:
             query = """
             SELECT DISTINCT ON (h.id)
-                h.title as homework_title,
-                h.due_date as homework_due_date,
-                h.details as homework_details,
-                u.firstname || ' ' || u.lastname AS author_name,
-                s.is_done as is_done
-            FROM assigned_homework h
-            JOIN "user" u ON h.author = u.id
-            JOIN homework_status s ON s.homework = h.id
-            WHERE s.student = %s
+              h.title as homework_title,
+              h.due_date as homework_due_date,
+              h.details as homework_details,
+              u.firstname || ' ' || u.lastname AS author_name,
+              s.is_done as is_done
+            FROM
+              assigned_homework h
+            JOIN
+              "user" u ON h.author = u.id
+            JOIN
+              homework_status s ON s.homework = h.id
+            WHERE
+              s.student = %s
               AND h.assigned_class = (SELECT class FROM student_info WHERE user_id = %s)
             """
 

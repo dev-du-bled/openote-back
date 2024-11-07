@@ -16,7 +16,7 @@ class Late(BaseModel):
 
 
 @router.get("/lates", name="Get lates")
-async def get_lates_endp(Authorization: str = Header(...), id: int | None = None):
+async def get_late_endp(Authorization: str = Header(...), id: int | None = None):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -47,7 +47,7 @@ async def get_lates_endp(Authorization: str = Header(...), id: int | None = None
 
 
 @router.post("/lates", name="Mark as late", status_code=status.HTTP_204_NO_CONTENT)
-async def post_lates_endp(late: Late, Authorization: str = Header(...)):
+async def add_late_endp(late: Late, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
