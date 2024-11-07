@@ -1,7 +1,7 @@
 INSERT INTO "user" VALUES ( 0,'Student','1','he/him', 'student1@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', 'http://localhost:8000/images/logos/0.webp' );
-INSERT INTO "user" VALUES ( 1,'Student','2','he/him', 'student2@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', null );
-INSERT INTO "user" VALUES ( 2,'Admin','Admin','he/him', 'admin@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'admin', null );
-INSERT INTO "user" VALUES ( 3,'Teacher', 'Teacher', 'he/him', 'teacher@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'teacher', 'http://localhost:8000/images/logos/2.webp' );
+INSERT INTO "user" VALUES ( 1,'Student','2','he/him', 'student2@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'student', 'http://localhost:8000/images/logos/1.webp' );
+INSERT INTO "user" VALUES ( 2,'Admin','Admin','he/him', 'admin@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'admin', 'http://localhost:8000/images/logos/2.webp' );
+INSERT INTO "user" VALUES ( 3,'Teacher', 'Teacher', 'he/him', 'teacher@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'teacher', 'http://localhost:8000/images/logos/3.webp' );
 
 INSERT INTO "class" VALUES ( 0, 'BUT_1' );
 INSERT INTO "class" VALUES ( 1, 'BUT_2' );
