@@ -12,6 +12,7 @@ async def get_homework_endp(
     Authorization: str = Header(...),
     id: int | None = None,
     max_homework: int | None = None,
+    show_not_completed_only: bool | None = False,
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -71,9 +72,12 @@ async def get_homework_endp(
                 query += "ORDER BY h.id, h.due_date ASC "
                 query += f"LIMIT {max_homework}"
 
+        if show_not_completed_only is not None:
+            query +=  "AND s.is_done != %s"
+
         query += ";"
 
-        c.execute(query) if id is not None else c.execute(query, (role_id, role_id))
+        c.execute(query) if id is not None else c.execute(query, (role_id, role_id, show_not_completed_only))
 
         res = c.fetchone() if id is not None else c.fetchall()
 
