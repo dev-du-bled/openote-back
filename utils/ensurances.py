@@ -34,7 +34,7 @@ def ensure_is_id_provided(c, id: int | None) -> None:
 
 
 def ensure_user_is_role(role: UserRole, required_role: UserRole) -> None:
-    if role.value < required_role.value:
+    if role.value < required_role.value or role:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You are not allowed to access this resource",
@@ -45,7 +45,13 @@ def ensure_user_is_admin(role: UserRole) -> None:
     ensure_user_is_role(role, UserRole.admin)
 
 
-def ensure_given_id_is_student(c, id: int) -> None:
+def ensure_given_id_is_student(c, id: int | None) -> None:
+    if id is None:
+        HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No user provided",
+        )
+
     c.execute(
         """SELECT role FROM "user" WHERE id=%s;""",
         (id,),
