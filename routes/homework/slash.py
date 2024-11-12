@@ -67,7 +67,7 @@ async def get_homework_endp(
         query = BASE_STUDENT_QUERY if role == ens.UserRole.student else BASE_TEACHER_QUERY
 
         if show_not_completed_only == True and role == ens.UserRole.student:
-            query += " AND s.is_done = false"
+            query += " AND s.is_done = false "
 
         if id is not None:
             query += f"AND h.id = {id}"
