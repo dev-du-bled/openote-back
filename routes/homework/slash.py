@@ -65,19 +65,21 @@ async def get_homework_endp(
               AND h.assigned_class = (SELECT class FROM student_info WHERE user_id = %s)
             """
 
+        if show_not_completed_only is not None:
+            query += " AND s.is_done != %s "
+
         if id is not None:
             query += f"AND h.id = {id}"
         else:
             if max_homework is not None:
                 query += "ORDER BY h.id, h.due_date ASC "
-                query += f"LIMIT {max_homework}"
-
-        if show_not_completed_only is not None:
-            query +=  "AND s.is_done != %s"
+                query += f"LIMIT {max_homework} "
 
         query += ";"
 
-        c.execute(query) if id is not None else c.execute(query, (role_id, role_id, show_not_completed_only))
+        c.execute(query) if id is not None else c.execute(
+            query, (role_id, role_id, show_not_completed_only)
+        )
 
         res = c.fetchone() if id is not None else c.fetchall()
 
