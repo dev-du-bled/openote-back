@@ -34,7 +34,7 @@ def ensure_is_id_provided(c, id: int | None) -> None:
 
 
 def ensure_user_is_role(role: UserRole, required_role: UserRole) -> None:
-    if role.value < required_role.value or role:
+    if role.value < required_role.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="You are not allowed to access this resource",
