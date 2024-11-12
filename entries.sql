@@ -36,12 +36,12 @@ INSERT INTO "assigned_homework" VALUES ( 5, 'Finir le TP 6', '2021-09-17', 3, 'F
 INSERT INTO "assigned_homework" VALUES ( 6, 'Finir le TP 7', '2021-12-18', 3, 'Finir le TP de la semaine 7', 1 );
 
 INSERT INTO "homework_status" VALUES ( 0, 0, false );
-INSERT INTO "homework_status" VALUES ( 1, 1, true );
+INSERT INTO "homework_status" VALUES ( 1, 0, true );
 INSERT INTO "homework_status" VALUES ( 2, 0, true );
 INSERT INTO "homework_status" VALUES ( 3, 0, true );
 INSERT INTO "homework_status" VALUES ( 4, 0, true );
 INSERT INTO "homework_status" VALUES ( 5, 0, true );
-INSERT INTO "homework_status" VALUES ( 6, 0, true );
+INSERT INTO "homework_status" VALUES ( 6, 1, true );
 
 INSERT INTO "exams" VALUES ( 0, 'Maths', 20, 1, '2021-12-12', 'Maths');
 INSERT INTO "exams" VALUES ( 1, 'Optimization', 10, 2, '2021-12-13', 'Optimization');
