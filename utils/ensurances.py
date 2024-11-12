@@ -19,7 +19,7 @@ def get_user_col_from_token(c, col: str, Authorization: str) -> str:
     if res is not None:
         return res.get(col)
 
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such session")
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No such session")
 
 
 def get_role_from_token(c, Authorization: str) -> UserRole:
