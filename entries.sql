@@ -26,6 +26,7 @@ INSERT INTO "unit" VALUES ( 'Data Science' );
 INSERT INTO "unit" VALUES ( 'Statistics' );
 INSERT INTO "unit" VALUES ( 'Law' );
 INSERT INTO "unit" VALUES ( 'Economy' );
+INSERT INTO "unit" VALUES ( 'History' );
 
 INSERT INTO "student_info" VALUES ( 1, 123456, 1, 1 );
 INSERT INTO "student_info" VALUES ( 2, 120457, 2, 5 );
@@ -71,6 +72,9 @@ INSERT INTO "exams" VALUES ( DEFAULT, 'Découverte des lois avancées', 10, 2, '
 INSERT INTO "exams" VALUES ( DEFAULT, 'Découverte des lois internationales', 10, 3, '2022-02-10', 'Law');
 INSERT INTO "exams" VALUES ( DEFAULT, 'Découverte des lois internationales avancées', 10, 1, '2022-02-11', 'Law');
 INSERT INTO "exams" VALUES ( DEFAULT, 'Bases économie', 10, 2, '2022-02-12', 'Economy');
+INSERT INTO "exams" VALUES ( DEFAULT, 'Histoire France', 10, 3, '2022-02-13', 'History');
+INSERT INTO "exams" VALUES ( DEFAULT, 'Histoire Europe', 10, 1, '2022-02-14', 'History');
+INSERT INTO "exams" VALUES ( DEFAULT, 'Histoire Monde', 10, 2, '2022-02-15', 'History');
 
 INSERT INTO "marks" VALUES ( 1, 1, 11, DEFAULT );
 INSERT INTO "marks" VALUES ( 1, 2, 10, DEFAULT );
@@ -94,6 +98,9 @@ INSERT INTO "marks" VALUES ( 1, 19, 7, DEFAULT );
 INSERT INTO "marks" VALUES ( 1, 20, 10, DEFAULT );
 INSERT INTO "marks" VALUES ( 1, 21, 8, DEFAULT );
 INSERT INTO "marks" VALUES ( 1, 22, 20, DEFAULT );
+INSERT INTO "marks" VALUES ( 1, 23, 20, DEFAULT );
+INSERT INTO "marks" VALUES ( 1, 24, 2, DEFAULT );
+INSERT INTO "marks" VALUES ( 1, 25, 15, DEFAULT );
 INSERT INTO "marks" VALUES ( 2, 1, 11, DEFAULT );
 INSERT INTO "marks" VALUES ( 2, 2, 10, DEFAULT );
 INSERT INTO "marks" VALUES ( 2, 3, 15, DEFAULT );
@@ -116,3 +123,6 @@ INSERT INTO "marks" VALUES ( 2, 19, 7, DEFAULT );
 INSERT INTO "marks" VALUES ( 2, 20, 10, DEFAULT );
 INSERT INTO "marks" VALUES ( 2, 21, 15, DEFAULT );
 INSERT INTO "marks" VALUES ( 2, 22, 20, DEFAULT );
+INSERT INTO "marks" VALUES ( 2, 23, 20, DEFAULT );
+INSERT INTO "marks" VALUES ( 2, 24, 2, DEFAULT );
+INSERT INTO "marks" VALUES ( 2, 25, 15, DEFAULT );
