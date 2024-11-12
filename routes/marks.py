@@ -122,8 +122,6 @@ async def get_mark_endp(
             res = c.fetchall()
 
         elif exam_id is not None:
-            ens.ensure_user_is_role(role, ens.UserRole.teacher)
-
             query = """
             SELECT
               m.id AS mark_id,
@@ -148,6 +146,10 @@ async def get_mark_endp(
             WHERE
                 m.exam_id = %s
             """
+
+            if ens.get_role_from_token(c, Authorization) == ens.UserRole.student:
+                role_id = ens.get_user_col_from_token(c, "id", Authorization)
+                query += f"AND m.user_id = {role_id} "
 
             if max_mark is not None:
                 query += "ORDER BY e.date ASC "
