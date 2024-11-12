@@ -23,6 +23,7 @@ async def get_mark_endp(
     user_id: int | None = None,
     exam_id: int | None = None,
     max_mark: int | None = None,
+    start_index: int | None = None,
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -34,7 +35,13 @@ async def get_mark_endp(
 
             query = """
             SELECT
-              m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
+              m.id AS mark_id,
+              m.value AS mark_value,
+              e.title AS exam_title,
+              e.max_mark AS exam_max_mark,
+              e.coefficient AS exam_coefficient,
+              e.date AS exam_date,
+              e.unit AS exam_unit
             FROM
               marks m
             JOIN
@@ -47,6 +54,9 @@ async def get_mark_endp(
             if max_mark is not None:
                 query += "ORDER BY e.date ASC "
                 query += f"LIMIT {max_mark} "
+
+            if start_index is not None:
+                query += f"OFFSET {start_index} "
 
             query += ";"
 
@@ -61,7 +71,13 @@ async def get_mark_endp(
             c.execute(
                 """
                 SELECT
-                  m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
+                  m.id AS mark_id,
+                  m.value AS mark_value,
+                  e.title AS exam_title,
+                  e.max_mark AS exam_max_mark,
+                  e.coefficient AS exam_coefficient,
+                  e.date AS exam_date,
+                  e.unit AS exam_unit
                 FROM
                   marks m
                 JOIN
@@ -78,14 +94,26 @@ async def get_mark_endp(
             ens.ensure_given_id_is_student(c, user_id)
 
             query = """
-            SELECT m.value, e.title, e.max_mark, e.coefficient, e.date, e.unit
-            FROM marks m JOIN exams e ON m.exam_id = e.id
-            WHERE m.user_id = %s
+            SELECT
+              m.id AS mark_id,
+              m.value AS mark_value,
+              e.title AS exam_title,
+              e.max_mark AS exam_max_mark,
+              e.coefficient AS exam_coefficient,
+              e.date AS exam_date,
+              e.unit AS exam_unit
+            FROM
+              marks m JOIN exams e ON m.exam_id = e.id
+            WHERE
+              m.user_id = %s
             """
 
             if max_mark is not None:
                 query += "ORDER BY e.date ASC "
                 query += f"LIMIT {max_mark} "
+
+            if start_index is not None:
+                query += f"OFFSET {start_index} "
 
             query += ";"
 
@@ -94,10 +122,9 @@ async def get_mark_endp(
             res = c.fetchall()
 
         elif exam_id is not None:
-            ens.ensure_user_is_role(role, ens.UserRole.teacher)
-
             query = """
             SELECT
+              m.id AS mark_id,
               m.value AS mark_value,
               e.title AS exam_title,
               e.max_mark AS exam_max_mark,
@@ -120,9 +147,16 @@ async def get_mark_endp(
                 m.exam_id = %s
             """
 
+            if ens.get_role_from_token(c, Authorization) == ens.UserRole.student:
+                role_id = ens.get_user_col_from_token(c, "id", Authorization)
+                query += f"AND m.user_id = {role_id} "
+
             if max_mark is not None:
                 query += "ORDER BY e.date ASC "
                 query += f"LIMIT {max_mark} "
+
+            if start_index is not None:
+                query += f"OFFSET {start_index} "
 
             query += ";"
 
