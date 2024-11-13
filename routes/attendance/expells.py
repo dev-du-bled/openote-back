@@ -97,7 +97,7 @@ async def add_expell_endp(exp: Expell, Authorization: str = Header(...)):
               expelled=True, expel_reason=%s
             WHERE
               class_id=%s AND student_id=%s;""",
-            (exp.expel_reason, exp.class_id, exp.student_id),
+            (exp.expell_reason, exp.class_id, exp.student_id),
         )
 
         conn.commit()
