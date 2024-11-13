@@ -22,23 +22,36 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_admin(role)
-
         fields = gen.get_obj_fields(Attendance)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
-        if id is None:
+        if role == ens.UserRole.student:
             c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE present=True;"""
+                """
+                SELECT
+                  class_id,
+                  present
+                FROM
+                  attendance
+                WHERE
+                  student_id=%s;
+                """,
+                (ens.get_user_col_from_token(c, "id", Authorization),),
             )
             res = c.fetchall()
-
         else:
-            c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND present=True;""",
-                (id,),
-            )
-            res = c.fetchall()
+          if id is None:
+              c.execute(
+                  f"""SELECT {selected_fields} FROM attendance WHERE present=True;"""
+              )
+              res = c.fetchall()
+
+          else:
+              c.execute(
+                  f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND present=True;""",
+                  (id,),
+              )
+              res = c.fetchall()
 
         if res is None:
             raise HTTPException(

@@ -21,21 +21,35 @@ async def get_late_endp(Authorization: str = Header(...), id: int | None = None)
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_admin(role)
-
         fields = gen.get_obj_fields(Late)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
-        if id is None:
-            c.execute(f"""SELECT {selected_fields} FROM attendance WHERE late=True;""")
+        if role == ens.UserRole.student:
+            c.execute(
+                """
+                SELECT
+                  class_id,
+                  late
+                FROM
+                  attendance
+                WHERE
+                  student_id=%s;
+                """,
+                (ens.get_user_col_from_token(c, "id", Authorization),),
+            )
             res = c.fetchall()
 
         else:
-            c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND late=True;""",
-                (id,),
-            )
-            res = c.fetchall()
+          if id is None:
+              c.execute(f"""SELECT {selected_fields} FROM attendance WHERE late=True;""")
+              res = c.fetchall()
+
+          else:
+              c.execute(
+                  f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND late=True;""",
+                  (id,),
+              )
+              res = c.fetchall()
 
         if res is None:
             raise HTTPException(

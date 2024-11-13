@@ -21,23 +21,37 @@ async def get_expell_endp(Authorization: str = Header(...), id: int | None = Non
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
-        ens.ensure_user_is_admin(role)
-
         fields = gen.get_obj_fields(Expell)
         selected_fields = gen.format_fields_to_select_sql(fields)
 
-        if id is None:
+        if role == ens.UserRole.student:
             c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE expelled=True;"""
+                """
+                SELECT
+                  class_id,
+                  expell_reason
+                FROM
+                  attendance
+                WHERE
+                  student_id=%s;
+                """,
+                (ens.get_user_col_from_token(c, "id", Authorization),),
             )
             res = c.fetchall()
 
         else:
-            c.execute(
-                f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND expelled=True;""",
-                (id,),
-            )
-            res = c.fetchall()
+          if id is None:
+              c.execute(
+                  f"""SELECT {selected_fields} FROM attendance WHERE expelled=True;"""
+              )
+              res = c.fetchall()
+
+          else:
+              c.execute(
+                  f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND expelled=True;""",
+                  (id,),
+              )
+              res = c.fetchall()
 
         if res is None:
             raise HTTPException(
