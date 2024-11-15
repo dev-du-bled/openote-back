@@ -71,12 +71,13 @@ async def delete_homework_endp(id: int, Authorization: str = Header(...)):
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
         c.execute(
-        """
+            """
         DELETE FROM
           assigned_homework
         WHERE
           id=%s AND author=%s;
-        """, (id, role_id)
+        """,
+            (id, role_id),
         )
 
         conn.commit()

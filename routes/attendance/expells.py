@@ -40,18 +40,18 @@ async def get_expell_endp(Authorization: str = Header(...), id: int | None = Non
             res = c.fetchall()
 
         else:
-          if id is None:
-              c.execute(
-                  f"""SELECT {selected_fields} FROM attendance WHERE expelled=True;"""
-              )
-              res = c.fetchall()
+            if id is None:
+                c.execute(
+                    f"""SELECT {selected_fields} FROM attendance WHERE expelled=True;"""
+                )
+                res = c.fetchall()
 
-          else:
-              c.execute(
-                  f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND expelled=True;""",
-                  (id,),
-              )
-              res = c.fetchall()
+            else:
+                c.execute(
+                    f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND expelled=True;""",
+                    (id,),
+                )
+                res = c.fetchall()
 
         if res is None:
             raise HTTPException(

@@ -12,10 +12,15 @@ class Homework(BaseModel):
     homework_id: int
     is_done: bool
 
+
 @router.patch(
-    "/status", name="Mark given homework as done", status_code=status.HTTP_204_NO_CONTENT
+    "/status",
+    name="Mark given homework as done",
+    status_code=status.HTTP_204_NO_CONTENT,
 )
-async def edit_homeworks_status_endp(homework: Homework, Authorization: str = Header(...)):
+async def edit_homeworks_status_endp(
+    homework: Homework, Authorization: str = Header(...)
+):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
@@ -35,6 +40,8 @@ async def edit_homeworks_status_endp(homework: Homework, Authorization: str = He
         c.execute(query, (homework.is_done, user_id, homework.homework_id))
 
         if c.rowcount == 0:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Homework")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Homework"
+            )
 
         conn.commit()

@@ -40,16 +40,18 @@ async def get_late_endp(Authorization: str = Header(...), id: int | None = None)
             res = c.fetchall()
 
         else:
-          if id is None:
-              c.execute(f"""SELECT {selected_fields} FROM attendance WHERE late=True;""")
-              res = c.fetchall()
+            if id is None:
+                c.execute(
+                    f"""SELECT {selected_fields} FROM attendance WHERE late=True;"""
+                )
+                res = c.fetchall()
 
-          else:
-              c.execute(
-                  f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND late=True;""",
-                  (id,),
-              )
-              res = c.fetchall()
+            else:
+                c.execute(
+                    f"""SELECT {selected_fields} FROM attendance WHERE class_id=%s AND late=True;""",
+                    (id,),
+                )
+                res = c.fetchall()
 
         if res is None:
             raise HTTPException(
