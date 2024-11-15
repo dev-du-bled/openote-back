@@ -41,6 +41,7 @@ INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 4', '2021-07-15',
 INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 5', '2021-08-16', 3, 'Finir le TP de la semaine 5', 1 );
 INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 6', '2021-09-17', 3, 'Finir le TP de la semaine 6', 1 );
 INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 7', '2021-12-18', 3, 'Finir le TP de la semaine 7', 2 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 8', '2021-12-19', 4, 'Finir le TP de la semaine 8', 1 );
 
 INSERT INTO "homework_status" VALUES ( 1, 1, false );
 INSERT INTO "homework_status" VALUES ( 2, 1, true );

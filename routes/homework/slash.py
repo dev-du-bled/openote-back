@@ -43,6 +43,8 @@ JOIN
   class c ON h.assigned_class = c.id
 LEFT JOIN
   homework_status s ON s.homework = h.id
+WHERE
+  h.author = %s
 GROUP BY
   h.id, u.firstname, u.lastname, c.name
 """
@@ -82,7 +84,7 @@ async def get_homework_endp(
 
         query += ";"
 
-        c.execute(query, (role_id, role_id)) if role == ens.UserRole.student else c.execute(query)
+        c.execute(query, (role_id, role_id)) if role == ens.UserRole.student else c.execute(query, (role_id,))
 
         res = c.fetchone() if id is not None else c.fetchall()
 
