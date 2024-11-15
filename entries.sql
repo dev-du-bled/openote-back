@@ -34,14 +34,14 @@ INSERT INTO "student_info" VALUES ( 2, 120457, 2, 5 );
 INSERT INTO "attendance" VALUES ( 1, 1, true, false, '', true );
 INSERT INTO "attendance" VALUES ( 2, 2, true, true, 'Too late', false );
 
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 1', '2021-01-12', 3, 'Finir le TP de la semaine 1', 1 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 2', '2021-01-13', 3, 'Finir le TP de la semaine 2', 1 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 3', '2022-05-14', 3, 'Finir le TP de la semaine 3', 1 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 4', '2021-07-15', 3, 'Finir le TP de la semaine 4', 1 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 5', '2021-08-16', 3, 'Finir le TP de la semaine 5', 1 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 6', '2021-09-17', 3, 'Finir le TP de la semaine 6', 1 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 7', '2021-12-18', 3, 'Finir le TP de la semaine 7', 2 );
-INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 8', '2021-12-19', 4, 'Finir le TP de la semaine 8', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 1', '2021-01-12', 4, 'Finir le TP de la semaine 1', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 2', '2021-01-13', 4, 'Finir le TP de la semaine 2', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 3', '2022-05-14', 4, 'Finir le TP de la semaine 3', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 4', '2021-07-15', 4, 'Finir le TP de la semaine 4', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 5', '2021-08-16', 4, 'Finir le TP de la semaine 5', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 6', '2021-09-17', 4, 'Finir le TP de la semaine 6', 1 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 7', '2021-12-18', 1, 'Finir le TP de la semaine 7', 2 );
+INSERT INTO "assigned_homework" VALUES ( DEFAULT, 'Finir le TP 8', '2021-12-19', 1, 'Finir le TP de la semaine 8', 1 );
 
 INSERT INTO "homework_status" VALUES ( 1, 1, false );
 INSERT INTO "homework_status" VALUES ( 2, 1, true );

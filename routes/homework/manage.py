@@ -30,7 +30,9 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
                 INSERT INTO
                   assigned_homework (title, due_date, author, details, assigned_class)
                 VALUES
-                  (%s, %s, %s, %s, %s);""",
+                  (%s, %s, %s, %s, %s)
+                RETURNING id;
+                """,
                 (
                     homework.title,
                     homework.due_date,
@@ -38,6 +40,18 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
                     homework.details,
                     homework.assigned_class if role == ens.UserRole.teacher else None,
                 ),
+            )
+
+            created_id = c.fetchone()["id"]
+
+            c.execute(
+                """
+                INSERT INTO
+                  homework_status (homework, student, is_done)
+                VALUES
+                  (%s, %s, false);
+                """,
+                (created_id, role_id),
             )
 
             conn.commit()
@@ -54,13 +68,16 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
 async def delete_homework_endp(id: int, Authorization: str = Header(...)):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        role = ens.get_role_from_token(c, Authorization)
+        role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
-        ens.ensure_user_is_role(role, ens.UserRole.teacher)
-
-        c.execute("DELETE FROM homework_status WHERE homework=%s;", (id,))
-
-        c.execute("DELETE FROM assigned_homework WHERE id=%s;", (id,))
+        c.execute(
+        """
+        DELETE FROM
+          assigned_homework
+        WHERE
+          id=%s AND author=%s;
+        """, (id, role_id)
+        )
 
         conn.commit()
 
@@ -73,14 +90,12 @@ async def edit_homework_endp(
 ):
     conn = get_db_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
-        role = ens.get_role_from_token(c, Authorization)
-
-        ens.ensure_user_is_role(role, ens.UserRole.teacher)
+        role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
         fields = gen.get_obj_fields(Homework)
         c.execute(
-            f"SELECT {gen.format_fields_to_select_sql(fields)} FROM assigned_homework WHERE id=%s;",
-            (id,),
+            f"SELECT {gen.format_fields_to_select_sql(fields)} FROM assigned_homework WHERE id=%s AND author=%s;",
+            (id, role_id),
         )
 
         old_data = c.fetchone()
@@ -92,8 +107,8 @@ async def edit_homework_endp(
         new_data = gen.merge_data(Homework, old_data, homework)
 
         c.execute(
-            f"""UPDATE assigned_homework SET {gen.format_fields_to_update_sql(fields)} WHERE id=%s;""",
-            (new_data + (id,)),
+            f"""UPDATE assigned_homework SET {gen.format_fields_to_update_sql(fields)} WHERE id=%s AND author=%s;""",
+            (new_data + (id, role_id)),
         )
 
         conn.commit()
