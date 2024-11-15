@@ -14,7 +14,8 @@ SELECT DISTINCT ON (h.id)
   h.due_date as homework_due_date,
   h.details as homework_details,
   u.firstname || ' ' || u.lastname AS author_name,
-  s.is_done as is_done
+  s.is_done as is_done,
+  (h.author = s.student) as is_author
 FROM
   assigned_homework h
 JOIN

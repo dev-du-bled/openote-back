@@ -50,6 +50,7 @@ INSERT INTO "homework_status" VALUES ( 4, 1, true );
 INSERT INTO "homework_status" VALUES ( 5, 1, true );
 INSERT INTO "homework_status" VALUES ( 6, 1, true );
 INSERT INTO "homework_status" VALUES ( 7, 2, true );
+INSERT INTO "homework_status" VALUES ( 8, 1, false );
 
 INSERT INTO "exams" VALUES ( DEFAULT, 'Devoir final', 20, 1, '2021-12-12', 'Maths');
 INSERT INTO "exams" VALUES ( DEFAULT, 'TP numéro 1', 10, 2, '2021-12-13', 'Optimization');
