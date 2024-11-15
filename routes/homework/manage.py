@@ -23,7 +23,7 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
-        # TODO: check if student, assign_class_id to null
+
         try:
             c.execute(
                 """
@@ -36,7 +36,7 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
                     homework.due_date,
                     role_id,
                     homework.details,
-                    homework.assigned_class,
+                    homework.assigned_class if role == ens.UserRole.teacher else None,
                 ),
             )
 
