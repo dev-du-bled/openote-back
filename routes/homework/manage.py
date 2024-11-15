@@ -42,7 +42,14 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
                 ),
             )
 
-            created_id = c.fetchone()["id"]
+            row = c.fetchone()
+            if row is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Failed to create homework"
+                )
+
+            created_id = row["id"]
 
             c.execute(
                 """
