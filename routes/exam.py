@@ -4,9 +4,10 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 class Exam(BaseModel):
@@ -18,7 +19,7 @@ class Exam(BaseModel):
 
 @router.get("", name="List exams")
 async def get_exam_endp(Authorization: str = Header(...), id: int | None = None):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
 
@@ -47,7 +48,7 @@ async def get_exam_endp(Authorization: str = Header(...), id: int | None = None)
 
 @router.delete("/manage", name="Delete an exam", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_exam_endp(id: int, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -60,7 +61,7 @@ async def delete_exam_endp(id: int, Authorization: str = Header(...)):
 
 @router.patch("/manage", name="Edit an exam", status_code=status.HTTP_204_NO_CONTENT)
 async def edit_exam_endp(id: int | None, exam: Exam, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -90,7 +91,7 @@ async def edit_exam_endp(id: int | None, exam: Exam, Authorization: str = Header
 
 @router.post("/manage", name="Create an exam", status_code=status.HTTP_204_NO_CONTENT)
 async def add_exam_endp(exam: Exam, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_role(role, ens.UserRole.teacher)

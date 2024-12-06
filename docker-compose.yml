@@ -1,7 +1,8 @@
 services:
   openote_db:
     # image: postgres
-    build: .
+    build:
+      dockerfile: db.Dockerfile
     container_name: openote_db
     environment:
       POSTGRES_USER: openuser
@@ -10,5 +11,17 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./base.sql:/app/base.sql
+      - ./base.sql:/docker-entrypoint-initdb.d/base.sql # postgres will automatically source sql file her the first time it's initiated
       - ./entries.sql:/app/entries.sql
+
+  # openote_api:
+  #   depends_on:
+  #     - openote_db
+  #   build:
+  #     dockerfile: api.Dockerfile
+
+  #   environment:
+  #     OPENOTE_DB_NAME: openuser
+  #     OPENOTE_DB_USER: openuser
+  #     OPENOTE_DB_HOST: openote_db
+  #     OPENOTE_DB_PASS: openpass

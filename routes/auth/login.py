@@ -5,7 +5,7 @@ from datetime import timedelta as td
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
-from db import get_db_connection
+from db import Database
 
 
 class LoginCred(BaseModel):
@@ -15,11 +15,12 @@ class LoginCred(BaseModel):
 
 
 router = APIRouter()
+db = Database()
 
 
 @router.post("/login", name="Login", status_code=status.HTTP_201_CREATED)
 async def login_endp(creds: LoginCred):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor() as c:
         c.execute(
             """SELECT id,password_hash FROM "user" WHERE email=%s;""", (creds.email,)

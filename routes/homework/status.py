@@ -3,9 +3,10 @@ from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 class Homework(BaseModel):
@@ -21,7 +22,7 @@ class Homework(BaseModel):
 async def edit_homeworks_status_endp(
     homework: Homework, Authorization: str = Header(...)
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         user_id = ens.get_user_col_from_token(c, "id", Authorization)

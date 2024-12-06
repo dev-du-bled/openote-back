@@ -5,9 +5,10 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 class Marks(BaseModel):
@@ -25,7 +26,7 @@ async def get_mark_endp(
     max_mark: int | None = None,
     start_index: int | None = None,
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -176,7 +177,7 @@ async def get_mark_endp(
 async def delete_mark_endp(
     user_id: int, exam_id: int, Authorization: str = Header(...)
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -193,7 +194,7 @@ async def delete_mark_endp(
 async def edit_mark_endp(
     user_id: int, exam_id: int, mark: Marks, Authorization: str = Header(...)
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -235,7 +236,7 @@ async def edit_mark_endp(
 
 @router.post("/manage", name="Create a mark", status_code=status.HTTP_204_NO_CONTENT)
 async def add_mark_endp(mark: Marks, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     ens.ensure_fields_nonnull(mark)
 
     with conn.cursor(cursor_factory=RealDictCursor) as c:

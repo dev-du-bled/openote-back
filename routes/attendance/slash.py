@@ -5,9 +5,10 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 class Attendance(BaseModel):
@@ -18,7 +19,7 @@ class Attendance(BaseModel):
 
 @router.get("", name="Get attendance")
 async def get_attendance_endp(Authorization: str = Header(...), id: str | None = None):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -64,7 +65,7 @@ async def get_attendance_endp(Authorization: str = Header(...), id: str | None =
 
 @router.post("", name="Add attendance", status_code=status.HTTP_204_NO_CONTENT)
 async def add_attendance_endp(att: Attendance, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 

@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 
 class Element(BaseModel):
@@ -12,13 +12,14 @@ class Element(BaseModel):
 
 
 router = APIRouter()
+db = Database()
 
 
 @router.get("/{type}", name="Get collection")
 async def get_collection_endp(
     Authorization: str = Header(...), type: str = None, id: int | None = None
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         if type != "class" and type != "group":
             raise HTTPException(
@@ -43,7 +44,7 @@ async def get_collection_endp(
 async def add_collection_endp(
     ce: Element, Authorization: str = Header(...), type: str = None
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         if type != "class" and type != "group":
             raise HTTPException(
@@ -74,7 +75,7 @@ async def add_collection_endp(
 async def delete_collection_endp(
     Authorization: str = Header(...), type: str = None, id: int = None
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         if type != "class" and type != "group":
             raise HTTPException(
@@ -102,7 +103,7 @@ async def delete_collection_endp(
 async def edit_collection_endp(
     pe: Element, Authorization: str = Header(...), type: str = None, id: int = None
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         if type != "class" and type != "group":
             raise HTTPException(

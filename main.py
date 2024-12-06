@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
+
 from routes.attendance.expells import router as attendance_expells_router
 from routes.attendance.lates import router as attendance_lates_router
 

@@ -5,9 +5,10 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 class Homework(BaseModel):
@@ -19,7 +20,7 @@ class Homework(BaseModel):
 
 @router.post("/manage", name="Create a homework", status_code=status.HTTP_201_CREATED)
 async def add_homework_endp(homework: Homework, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
@@ -46,7 +47,7 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
             if row is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Failed to create homework"
+                    detail="Failed to create homework",
                 )
 
             created_id = row["id"]
@@ -73,7 +74,7 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
     "/manage", name="Delete a homework", status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_homework_endp(id: int, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
@@ -96,7 +97,7 @@ async def delete_homework_endp(id: int, Authorization: str = Header(...)):
 async def edit_homework_endp(
     id: int, homework: Homework, Authorization: str = Header(...)
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
 

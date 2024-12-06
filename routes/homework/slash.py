@@ -2,9 +2,10 @@ from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
 
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 BASE_STUDENT_QUERY = """
@@ -58,7 +59,7 @@ async def get_homework_endp(
     max_homework: int | None = None,
     show_not_completed_only: bool | None = False,
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         role_id = ens.get_user_col_from_token(c, "id", Authorization)

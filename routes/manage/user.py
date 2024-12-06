@@ -7,9 +7,10 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 class UpdateUserData(BaseModel):
@@ -35,7 +36,7 @@ class AddUserData(BaseModel):
 
 @router.get("/user", name="Get users data")
 async def get_user_endp(Authorization: str = Header(...), id: int | None = None):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -60,7 +61,7 @@ async def get_user_endp(Authorization: str = Header(...), id: int | None = None)
 
 @router.post("/user", name="Add user", status_code=status.HTTP_201_CREATED)
 async def add_user_endp(ud: AddUserData, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -116,7 +117,7 @@ async def add_user_endp(ud: AddUserData, Authorization: str = Header(...)):
 
 @router.delete("/user", name="Delete user", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user_endp(Authorization: str = Header(...), id: int = None):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_admin(role)
@@ -140,7 +141,7 @@ async def delete_user_endp(Authorization: str = Header(...), id: int = None):
 async def edit_usr_endp(
     user_data: UpdateUserData, Authorization: str = Header(...), id: int = None
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_admin(role)

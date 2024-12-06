@@ -5,16 +5,17 @@ from PIL import Image
 from psycopg2.extras import RealDictCursor
 
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 router = APIRouter()
+db = Database()
 
 
 @router.post("/logo", name="Upload logo", status_code=status.HTTP_201_CREATED)
 async def upload_logo_endp(
     file: UploadFile, rq: Request, Authorization: str = Header(...)
 ):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
         userid = ens.get_user_col_from_token(c, "id", Authorization)

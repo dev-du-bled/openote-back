@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 
 class UpdateUserData(BaseModel):
@@ -15,11 +15,12 @@ class UpdateUserData(BaseModel):
 
 
 router = APIRouter()
+db = Database()
 
 
 @router.get("/user", name="Get user data")
 async def get_user_endp(Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
 
@@ -67,7 +68,7 @@ async def get_user_endp(Authorization: str = Header(...)):
 
 @router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
 async def edit_user_endp(user_data: UpdateUserData, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
 

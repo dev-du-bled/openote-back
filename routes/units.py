@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
 import utils.ensurances as ens
-from db import get_db_connection
+from db import Database
 
 
 class UpdateUnit(BaseModel):
@@ -17,11 +17,12 @@ class Unit(BaseModel):
 
 
 router = APIRouter()
+db = Database()
 
 
 @router.get("/", name="List units")
 async def get_unit_endp(Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         _ = ens.get_role_from_token(c, Authorization)
 
@@ -34,7 +35,7 @@ async def get_unit_endp(Authorization: str = Header(...)):
 
 @router.patch("/", name="Update unit", status_code=status.HTTP_204_NO_CONTENT)
 async def edit_unit_endp(update_data: UpdateUnit, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_admin(role)
@@ -55,7 +56,7 @@ async def edit_unit_endp(update_data: UpdateUnit, Authorization: str = Header(..
 
 @router.post("/", name="Create unit", status_code=status.HTTP_204_NO_CONTENT)
 async def add_unit_endp(update_data: Unit, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_admin(role)
@@ -74,7 +75,7 @@ async def add_unit_endp(update_data: Unit, Authorization: str = Header(...)):
 
 @router.delete("/", name="Delete unit", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_unit_endp(data: Unit, Authorization: str = Header(...)):
-    conn = get_db_connection()
+    conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         ens.ensure_user_is_admin(role)
