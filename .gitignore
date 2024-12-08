@@ -4,3 +4,5 @@ __pycache__
 .DS_Store
 routes/.DS_Store
 storage/*
+.ropeproject
+.ruff_cache
