@@ -20,7 +20,8 @@ async def upload_logo_endp(
         _ = ens.get_role_from_token(c, Authorization)
         userid = ens.get_user_col_from_token(c, "id", Authorization)
 
-        filename = f"storage/logos/{userid}.webp"
+        # TODO: Replace local file storage with s3, probably minio?
+        filename = f"/app/storage/logos/{userid}.webp"
         byte_file = await file.read()
 
         img = Image.open(BytesIO(byte_file))
