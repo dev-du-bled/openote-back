@@ -1,7 +1,6 @@
 FROM alpine:latest
 ENV env=container
 COPY src /app/src/
-COPY res/healthcheck.py /app/healthcheck.py
 RUN apk add --no-cache python3 py3-pip
 RUN pip3 install psycopg2-binary fastapi fastapi[standard] pillow --break-system-packages
 RUN mkdir -p /app/storage/logos
