@@ -50,7 +50,7 @@ if not os.path.exists("storage/logos/"):
     os.mkdir("storage")
     os.mkdir("storage/logos")
 
-api = FastAPI()
+api = FastAPI(root_path="/api/v1")
 
 api.add_middleware(
     CORSMiddleware,
