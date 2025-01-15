@@ -26,7 +26,6 @@ JOIN
   homework_status s ON s.homework = h.id
 WHERE
   s.student = %s
-  AND h.assigned_class = (SELECT class FROM student_info WHERE user_id = %s)
 """
 
 BASE_TEACHER_QUERY = """
@@ -92,7 +91,7 @@ async def get_homework_endp(
         query += ";"
 
         c.execute(
-            query, (role_id, role_id)
+            query, (role_id,)
         ) if role == ens.UserRole.student else c.execute(query, (role_id,))
 
         res = c.fetchone() if id is not None else c.fetchall()
