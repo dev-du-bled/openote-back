@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
 
+from datetime import date
 import utils.ensurances as ens
 from db import Database
 
@@ -58,6 +59,7 @@ async def get_homework_endp(
     id: int | None = None,
     max_homework: int | None = None,
     show_not_completed_only: bool | None = False,
+    show_done_and_past_only: bool | None = False,
 ):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -74,8 +76,11 @@ async def get_homework_endp(
             BASE_STUDENT_QUERY if role == ens.UserRole.student else BASE_TEACHER_QUERY
         )
 
-        if show_not_completed_only and role == ens.UserRole.student:
+        if role == ens.UserRole.student:
+          if show_not_completed_only:
             query += " AND s.is_done = false "
+          if show_done_and_past_only:
+            query += f" AND s.is_done = true AND h.due_date < '{date.today()}' "
 
         if id is not None:
             query += f"AND h.id = {id}"
