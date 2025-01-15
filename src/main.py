@@ -37,6 +37,9 @@ from routes.planning import router as planning_router
 # User route
 from routes.user import router as user_router
 
+# Password route
+from routes.password import router as password_router
+
 # Units route
 from routes.units import router as units_router
 
@@ -71,6 +74,8 @@ api.include_router(attendance_expells_router, prefix="/attendance")
 api.include_router(attendance_lates_router, prefix="/attendance")
 
 api.include_router(user_router)
+
+api.include_router(password_router)
 
 api.include_router(planning_router)
 

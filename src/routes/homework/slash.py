@@ -1,7 +1,8 @@
+from datetime import date
+
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
 
-from datetime import date
 import utils.ensurances as ens
 from db import Database
 
