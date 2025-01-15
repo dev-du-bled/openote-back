@@ -25,17 +25,15 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
         role = ens.get_role_from_token(c, Authorization)
         role_id = ens.get_user_col_from_token(c, "id", Authorization)
 
-        QUERY = """
-        INSERT INTO
-          assigned_homework (title, due_date, author, details, assigned_class)
-        VALUES
-          (%s, %s, %s, %s, %s)
-        RETURNING id;
-        """
-
         try:
             c.execute(
-                QUERY,
+                """
+              INSERT INTO
+                assigned_homework (title, due_date, author, details, assigned_class)
+              VALUES
+                (%s, %s, %s, %s, %s)
+              RETURNING id;
+              """,
                 (
                     homework.title,
                     homework.due_date,
