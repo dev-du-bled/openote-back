@@ -90,9 +90,9 @@ async def get_homework_endp(
 
         query += ";"
 
-        c.execute(
+        c.execute(query, (role_id,)) if role == ens.UserRole.student else c.execute(
             query, (role_id,)
-        ) if role == ens.UserRole.student else c.execute(query, (role_id,))
+        )
 
         res = c.fetchone() if id is not None else c.fetchall()
 

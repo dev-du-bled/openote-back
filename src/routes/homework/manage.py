@@ -34,7 +34,8 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
         """
 
         try:
-            c.execute(QUERY,
+            c.execute(
+                QUERY,
                 (
                     homework.title,
                     homework.due_date,
