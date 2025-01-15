@@ -77,10 +77,10 @@ async def get_homework_endp(
         )
 
         if role == ens.UserRole.student:
-          if show_not_completed_only:
-            query += " AND s.is_done = false "
-          if show_done_and_past_only:
-            query += f" AND s.is_done = true AND h.due_date < '{date.today()}' "
+            if show_not_completed_only:
+                query += " AND s.is_done = false "
+            if show_done_and_past_only:
+                query += f" AND s.is_done = true AND h.due_date < '{date.today()}' "
 
         if id is not None:
             query += f"AND h.id = {id}"

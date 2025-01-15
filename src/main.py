@@ -84,7 +84,9 @@ api.include_router(homework_main_router, prefix="/homework")
 api.include_router(homework_manage_router, prefix="/homework")
 api.include_router(homework_status_router, prefix="/homework")
 
-static_dir = "/app/storage/logos" if os.getenv("env")=="container" else "../storage/logos"
+static_dir = (
+    "/app/storage/logos" if os.getenv("env") == "container" else "../storage/logos"
+)
 api.mount(
     "/images/logos", StaticFiles(directory=static_dir), name="Static file storage"
 )
