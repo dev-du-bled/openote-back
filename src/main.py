@@ -36,7 +36,7 @@ from routes.planning import router as planning_router
 
 # User route
 from routes.user.manage import router as user_router
-from routes.user.mail import router as mail_router
+from routes.user.email import router as email_router
 from routes.user.password import router as password_router
 
 # Units route
@@ -73,7 +73,7 @@ api.include_router(attendance_expells_router, prefix="/attendance")
 api.include_router(attendance_lates_router, prefix="/attendance")
 
 api.include_router(user_router, prefix="/user")
-api.include_router(mail_router, prefix="/user")
+api.include_router(email_router, prefix="/user")
 api.include_router(password_router, prefix="/user")
 
 api.include_router(planning_router)

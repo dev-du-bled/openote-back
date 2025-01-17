@@ -17,7 +17,7 @@ router = APIRouter()
 db = Database()
 
 
-@router.patch("/mail", name="Update user email")
+@router.patch("/email", name="Update user email")
 async def update_email_endp(data: UpdateEmail, Authorization: str = Header(...)):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
