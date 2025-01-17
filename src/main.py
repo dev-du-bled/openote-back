@@ -35,10 +35,9 @@ from routes.homework.status import router as homework_status_router
 from routes.planning import router as planning_router
 
 # User route
-from routes.user import router as user_router
-
-# Password route
-from routes.password import router as password_router
+from routes.user.manage import router as user_router
+from routes.user.mail import router as mail_router
+from routes.user.password import router as password_router
 
 # Units route
 from routes.units import router as units_router
@@ -73,9 +72,9 @@ api.include_router(attendance_main_router, prefix="/attendance")
 api.include_router(attendance_expells_router, prefix="/attendance")
 api.include_router(attendance_lates_router, prefix="/attendance")
 
-api.include_router(user_router)
-
-api.include_router(password_router)
+api.include_router(user_router, prefix="/user")
+api.include_router(mail_router, prefix="/user")
+api.include_router(password_router, prefix="/user")
 
 api.include_router(planning_router)
 

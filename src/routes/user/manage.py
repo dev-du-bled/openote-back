@@ -18,7 +18,7 @@ router = APIRouter()
 db = Database()
 
 
-@router.get("/user", name="Get user data")
+@router.get("/", name="Get user data")
 async def get_user_endp(Authorization: str = Header(...)):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
@@ -66,7 +66,7 @@ async def get_user_endp(Authorization: str = Header(...)):
         return res
 
 
-@router.patch("/user", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
+@router.patch("/", name="Update user data", status_code=status.HTTP_204_NO_CONTENT)
 async def edit_user_endp(user_data: UpdateUserData, Authorization: str = Header(...)):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
