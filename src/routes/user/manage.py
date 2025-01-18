@@ -18,13 +18,18 @@ router = APIRouter()
 db = Database()
 s3c = S3Client()
 
+
 @router.get("/", name="Get user data")
 async def get_user_endp(Authorization: str = Header(...)):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
-        user_id = ens.get_user_col_from_token(c, "id", Authorization);
-        url = s3c.client.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': "user-logos", 'Key': f"{user_id}.webp"},ExpiresIn=3600) # pyright:ignore
+        user_id = ens.get_user_col_from_token(c, "id", Authorization)
+        url = s3c.client.generate_presigned_url(
+            ClientMethod="get_object",
+            Params={"Bucket": "user-logos", "Key": f"{user_id}.webp"},
+            ExpiresIn=3600,
+        )  # pyright:ignore
 
         if role == "student":
             c.execute(

@@ -11,6 +11,7 @@ router = APIRouter()
 db = Database()
 s3c = S3Client()
 
+
 @router.post("/logo", name="Upload logo", status_code=status.HTTP_201_CREATED)
 async def upload_logo_endp(
     file: UploadFile, rq: Request, Authorization: str = Header(...)
@@ -23,15 +24,18 @@ async def upload_logo_endp(
         filename = f"{userid}.webp"
         byte_file = await file.read()
 
-
         img = Image.open(BytesIO(byte_file))
         img = img.resize((512, 512))
         buffer = BytesIO()
         img.save(buffer, filename)
-        s3c.client.upload_file(filename, "user-logos", filename) # pyright:ignore
+        s3c.client.upload_file(filename, "user-logos", filename)  # pyright:ignore
 
         await file.close()
 
-
-
-        return {"url": s3c.client.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': "user-logos", 'Key': filename},ExpiresIn=3600)}  #pyright:ignore
+        return {
+            "url": s3c.client.generate_presigned_url(
+                ClientMethod="get_object",
+                Params={"Bucket": "user-logos", "Key": filename},
+                ExpiresIn=3600,
+            )
+        }  # pyright:ignore
