@@ -1,9 +1,11 @@
 import os
 
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
+from db import S3Client
 
 from routes.attendance.expells import router as attendance_expells_router
 from routes.attendance.lates import router as attendance_lates_router
@@ -48,9 +50,17 @@ from routes.upload import router as upload_router
 # Static storage
 from fastapi.staticfiles import StaticFiles
 
-if not os.path.exists("storage/logos/"):
-    os.mkdir("storage")
-    os.mkdir("storage/logos")
+s3c = S3Client()
+S3_REGION = os.getenv("S3_REGION", "eu-east-1")
+
+response = s3c.client.list_buckets() # pyright:ignore
+if not any(buck["Name"] == "user-logos" for buck in response["Buckets"]):
+    s3c.client.create_bucket(Bucket="user-logos", CreateBucketConfiguration={'LocationConstraint': S3_REGION}) # pyright:ignore
+
+
+# if not os.path.exists("storage/logos/"):
+#     os.mkdir("storage")
+#     os.mkdir("storage/logos")
 
 api = FastAPI(root_path="/api/v1")
 
@@ -88,12 +98,6 @@ api.include_router(homework_main_router, prefix="/homework")
 api.include_router(homework_manage_router, prefix="/homework")
 api.include_router(homework_status_router, prefix="/homework")
 
-static_dir = (
-    "/app/storage/logos" if os.getenv("env") == "container" else "../storage/logos"
-)
-api.mount(
-    "/images/logos", StaticFiles(directory=static_dir), name="Static file storage"
-)
 api.include_router(upload_router, prefix="/upload")
 
 

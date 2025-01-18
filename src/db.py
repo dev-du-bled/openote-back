@@ -1,4 +1,6 @@
 import psycopg2 as pg
+import boto3
+import botocore.client
 from os import getenv
 
 from psycopg2.extensions import connection
@@ -27,3 +29,26 @@ class Database(object):
 
     def get_connection(self) -> connection:
         return self.conn
+
+
+class S3Client(object):
+    client = None  # pyright:ignore
+
+    def __new__(cls):
+        S3_REGION = getenv("S3_REGION", "eu-east-1")
+        S3_LOGIN = getenv("S3_LOGIN", "openuser")
+        S3_PASS = getenv("S3_PASS", "openpass")
+        S3_URL = getenv("S3_URL", "http://localhost:9000")
+
+        if not hasattr(cls, "_instance") or not hasattr(cls, "client"):
+            try:
+                cls._instance = super(S3Client, cls).__new__(cls)
+                cls.client = boto3.client("s3", region_name=S3_REGION,  endpoint_url=S3_URL, aws_access_key_id=S3_LOGIN, aws_secret_access_key=S3_PASS)
+
+            except Exception as e:
+                raise RuntimeError(f"S3 Connection Error: {e}")
+
+        return cls._instance
+
+    def get_connection(self):
+        return self.client

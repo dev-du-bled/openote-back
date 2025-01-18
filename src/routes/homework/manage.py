@@ -1,3 +1,4 @@
+from copy import error
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2 import errors
 from psycopg2.extras import RealDictCursor
@@ -69,6 +70,11 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
                 status_code=status.HTTP_409_CONFLICT, detail="Homework already exists"
             )
 
+        except errors.InFailedSqlTransaction:
+            conn.rollback();
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="Homework already exists"
+            )
 
 @router.delete(
     "/manage", name="Delete a homework", status_code=status.HTTP_204_NO_CONTENT

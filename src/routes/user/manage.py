@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import Database
+from db import Database, S3Client
 
 
 class UpdateUserData(BaseModel):
@@ -16,13 +16,15 @@ class UpdateUserData(BaseModel):
 
 router = APIRouter()
 db = Database()
-
+s3c = S3Client()
 
 @router.get("/", name="Get user data")
 async def get_user_endp(Authorization: str = Header(...)):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
+        user_id = ens.get_user_col_from_token(c, "id", Authorization);
+        url = s3c.client.generate_presigned_url(ClientMethod='get_object',Params={'Bucket': "user-logos", 'Key': f"{user_id}.webp"},ExpiresIn=3600) # pyright:ignore
 
         if role == "student":
             c.execute(
@@ -33,7 +35,6 @@ async def get_user_endp(Authorization: str = Header(...)):
                   u.pronouns,
                   u.email,
                   u.role,
-                  u.profile_picture,
                   s.group,
                   s.class
                 FROM
@@ -49,7 +50,7 @@ async def get_user_endp(Authorization: str = Header(...)):
             c.execute(
                 """
                 SELECT
-                  lastname, firstname, pronouns, email, role, profile_picture
+                  lastname, firstname, pronouns, email, role
                 FROM
                   "user"
                 WHERE
@@ -63,6 +64,7 @@ async def get_user_endp(Authorization: str = Header(...)):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No such user"
             )
+        res["profile_picture"] = url
         return res
 
 
