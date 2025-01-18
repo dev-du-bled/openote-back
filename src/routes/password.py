@@ -2,23 +2,23 @@ import hashlib as hs
 
 from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 import utils.ensurances as ens
 from db import Database
 
 
-class UpdateEmail(BaseModel):
-    new_email: EmailStr
-    current_password: str
+class UpdatePassword(BaseModel):
+    old_password: str
+    new_password: str
 
 
 router = APIRouter()
 db = Database()
 
 
-@router.patch("/email", name="Update user email")
-async def update_email_endp(data: UpdateEmail, Authorization: str = Header(...)):
+@router.patch("/password", name="Update user password")
+async def update_password_endp(data: UpdatePassword, Authorization: str = Header(...)):
     conn = db.get_connection()
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         user_id = ens.get_user_col_from_token(c, "id", Authorization)
@@ -29,17 +29,14 @@ async def update_email_endp(data: UpdateEmail, Authorization: str = Header(...))
         if res is None:
             raise HTTPException(status_code=404, detail="No such user !")
 
-        if (
-            hs.sha256(data.current_password.encode()).hexdigest()
-            != res["password_hash"]
-        ):
+        if hs.sha256(data.old_password.encode()).hexdigest() != res["password_hash"]:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Wrong password !",
             )
 
         c.execute(
-            """UPDATE "user" SET email=%s WHERE id=%s;""",
-            (data.new_email, user_id),
+            """UPDATE "user" SET password_hash=%s WHERE id=%s;""",
+            (hs.sha256(data.new_password.encode()).hexdigest(), user_id),
         )
         conn.commit()
