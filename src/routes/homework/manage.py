@@ -70,10 +70,10 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
                 status_code=status.HTTP_409_CONFLICT, detail="Homework already exists"
             )
 
-        except errors.InFailedSqlTransaction:
+        except (errors.InFailedSqlTransaction, errors.DatetimeFieldOverflow):
             conn.rollback();
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Homework already exists"
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Date format"
             )
 
 @router.delete(
@@ -121,9 +121,16 @@ async def edit_homework_endp(
 
         new_data = gen.merge_data(Homework, old_data, homework)
 
-        c.execute(
-            f"""UPDATE assigned_homework SET {gen.format_fields_to_update_sql(fields)} WHERE id=%s AND author=%s;""",
-            (new_data + (id, role_id)),
-        )
+        try:
+            c.execute(
+                f"""UPDATE assigned_homework SET {gen.format_fields_to_update_sql(fields)} WHERE id=%s AND author=%s;""",
+                (new_data + (id, role_id)),
+            )
 
-        conn.commit()
+            conn.commit()
+
+        except (errors.InFailedSqlTransaction, errors.DatetimeFieldOverflow):
+            conn.rollback();
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Date format"
+            )

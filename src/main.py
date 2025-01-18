@@ -47,8 +47,6 @@ from routes.units import router as units_router
 # Upload route
 from routes.upload import router as upload_router
 
-# Static storage
-from fastapi.staticfiles import StaticFiles
 
 s3c = S3Client()
 S3_REGION = os.getenv("S3_REGION", "eu-east-1")
@@ -57,10 +55,6 @@ response = s3c.client.list_buckets() # pyright:ignore
 if not any(buck["Name"] == "user-logos" for buck in response["Buckets"]):
     s3c.client.create_bucket(Bucket="user-logos", CreateBucketConfiguration={'LocationConstraint': S3_REGION}) # pyright:ignore
 
-
-# if not os.path.exists("storage/logos/"):
-#     os.mkdir("storage")
-#     os.mkdir("storage/logos")
 
 api = FastAPI(root_path="/api/v1")
 
