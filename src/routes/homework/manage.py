@@ -71,10 +71,11 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
             )
 
         except errors.InFailedSqlTransaction:
-            conn.rollback();
+            conn.rollback()
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="Homework already exists"
             )
+
 
 @router.delete(
     "/manage", name="Delete a homework", status_code=status.HTTP_204_NO_CONTENT

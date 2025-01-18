@@ -43,7 +43,13 @@ class S3Client(object):
         if not hasattr(cls, "_instance") or not hasattr(cls, "client"):
             try:
                 cls._instance = super(S3Client, cls).__new__(cls)
-                cls.client = boto3.client("s3", region_name=S3_REGION,  endpoint_url=S3_URL, aws_access_key_id=S3_LOGIN, aws_secret_access_key=S3_PASS)
+                cls.client = boto3.client(
+                    "s3",
+                    region_name=S3_REGION,
+                    endpoint_url=S3_URL,
+                    aws_access_key_id=S3_LOGIN,
+                    aws_secret_access_key=S3_PASS,
+                )
 
             except Exception as e:
                 raise RuntimeError(f"S3 Connection Error: {e}")

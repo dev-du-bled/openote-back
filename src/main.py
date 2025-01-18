@@ -41,6 +41,8 @@ from routes.user.manage import router as user_router
 from routes.user.email import router as email_router
 from routes.user.password import router as password_router
 
+from routes.collection import router as collection_router
+
 # Units route
 from routes.units import router as units_router
 
@@ -53,9 +55,11 @@ from fastapi.staticfiles import StaticFiles
 s3c = S3Client()
 S3_REGION = os.getenv("S3_REGION", "eu-east-1")
 
-response = s3c.client.list_buckets() # pyright:ignore
+response = s3c.client.list_buckets()  # pyright:ignore
 if not any(buck["Name"] == "user-logos" for buck in response["Buckets"]):
-    s3c.client.create_bucket(Bucket="user-logos", CreateBucketConfiguration={'LocationConstraint': S3_REGION}) # pyright:ignore
+    s3c.client.create_bucket(
+        Bucket="user-logos", CreateBucketConfiguration={"LocationConstraint": S3_REGION}
+    )  # pyright:ignore
 
 
 # if not os.path.exists("storage/logos/"):
@@ -93,6 +97,8 @@ api.include_router(exam_router, prefix="/exam")
 api.include_router(marks_router, prefix="/marks")
 
 api.include_router(units_router, prefix="/units")
+
+api.include_router(collection_router, prefix="/collection")
 
 api.include_router(homework_main_router, prefix="/homework")
 api.include_router(homework_manage_router, prefix="/homework")
