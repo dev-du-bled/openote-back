@@ -71,8 +71,7 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
             )
 
         except (errors.InFailedSqlTransaction, errors.DatetimeFieldOverflow):
-            conn.rollback();
-
+            conn.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Date format"
             )
@@ -132,7 +131,7 @@ async def edit_homework_endp(
             conn.commit()
 
         except (errors.InFailedSqlTransaction, errors.DatetimeFieldOverflow):
-            conn.rollback();
+            conn.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Date format"
             )
