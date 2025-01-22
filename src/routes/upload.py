@@ -5,11 +5,16 @@ from PIL import Image
 from psycopg2.extras import RealDictCursor
 
 import utils.ensurances as ens
-from db import Database, S3Client
+from db import Database
+from os import getenv, path
+
+import base64
 
 router = APIRouter()
 db = Database()
-s3c = S3Client()
+
+
+logos_dir = "/app/storage/logos" if getenv("env")=="container" else "../.storage/logos" # TODO: Move to own file
 
 
 @router.post("/logo", name="Upload logo", status_code=status.HTTP_201_CREATED)
@@ -26,16 +31,14 @@ async def upload_logo_endp(
 
         img = Image.open(BytesIO(byte_file))
         img = img.resize((512, 512))
-        buffer = BytesIO()
-        img.save(buffer, filename)
-        s3c.client.upload_file(filename, "user-logos", filename)  # pyright:ignore
+
+        img.save(path.join(logos_dir, filename))
+
+        url = base64.b64encode(img.tobytes()).decode("utf-8")
+        url = "data:image/webp;base64, " + url
 
         await file.close()
 
         return {
-            "url": s3c.client.generate_presigned_url(
-                ClientMethod="get_object",
-                Params={"Bucket": "user-logos", "Key": filename},
-                ExpiresIn=3600,
-            )
+            "url": url
         }  # pyright:ignore

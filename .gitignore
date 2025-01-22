@@ -3,6 +3,6 @@ venv
 __pycache__
 .DS_Store
 routes/.DS_Store
-storage/*
+.storage
 .ropeproject
 .ruff_cache

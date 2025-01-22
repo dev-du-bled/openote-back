@@ -2,9 +2,11 @@ from fastapi import APIRouter, Header, HTTPException, status
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel
 
+import base64
 import utils.autogen as gen
 import utils.ensurances as ens
-from db import Database, S3Client
+from db import Database
+from os import getenv, path
 
 
 class UpdateUserData(BaseModel):
@@ -16,8 +18,7 @@ class UpdateUserData(BaseModel):
 
 router = APIRouter()
 db = Database()
-s3c = S3Client()
-
+logos_dir = "/app/storage/logos" if getenv("env")=="container" else "../.storage/logos" # TODO: Move to own file
 
 @router.get("/", name="Get user data")
 async def get_user_endp(Authorization: str = Header(...)):
@@ -25,11 +26,15 @@ async def get_user_endp(Authorization: str = Header(...)):
     with conn.cursor(cursor_factory=RealDictCursor) as c:
         role = ens.get_role_from_token(c, Authorization)
         user_id = ens.get_user_col_from_token(c, "id", Authorization)
-        url = s3c.client.generate_presigned_url(
-            ClientMethod="get_object",
-            Params={"Bucket": "user-logos", "Key": f"{user_id}.webp"},
-            ExpiresIn=3600,
-        )  # pyright:ignore
+
+        url = ""
+
+        filename = path.join(logos_dir, f"{user_id}.webp")
+        if path.exists(filename):
+            with open(filename,'rb') as f:
+                url = base64.b64encode(f.read()).decode("utf-8")
+                url = "data:image/webp;base64, " + url
+
 
         if role == "student":
             c.execute(

@@ -1,11 +1,11 @@
 import os
+import logging
 
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from db import S3Client
 
 from routes.attendance.expells import router as attendance_expells_router
 from routes.attendance.lates import router as attendance_lates_router
@@ -49,18 +49,16 @@ from routes.units import router as units_router
 # Upload route
 from routes.upload import router as upload_router
 
+log = logging.getLogger("uvicorn.error")
+log.setLevel(logging.DEBUG)
 
-s3c = S3Client()
-S3_REGION = os.getenv("S3_REGION", "eu-east-1")
-
-response = s3c.client.list_buckets()  # pyright:ignore
-if not any(buck["Name"] == "user-logos" for buck in response["Buckets"]):
-    s3c.client.create_bucket(
-        Bucket="user-logos", CreateBucketConfiguration={"LocationConstraint": S3_REGION}
-    )  # pyright:ignore
-
+logos_dir = "/app/storage/logos" if os.getenv("env")=="container" else "../.storage/logos"
+if not os.path.exists(logos_dir):
+    os.makedirs(logos_dir, 766)
+    log.info("Created logo storage")
 
 api = FastAPI(root_path="/api/v1")
+
 
 api.add_middleware(
     CORSMiddleware,
@@ -69,6 +67,7 @@ api.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 api.include_router(auth_login_router, prefix="/auth")
 api.include_router(auth_logout_router, prefix="/auth")
