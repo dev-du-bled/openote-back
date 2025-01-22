@@ -37,6 +37,7 @@ SELECT
   h.details as homework_details,
   u.firstname || ' ' || u.lastname AS author_name,
   c.name as class_name,
+  c.id as class_id,
   COUNT(CASE WHEN s.is_done = true THEN 1 END) AS completed_count
 FROM
   assigned_homework h
@@ -49,7 +50,7 @@ LEFT JOIN
 WHERE
   h.author = %s
 GROUP BY
-  h.id, u.firstname, u.lastname, c.name
+  h.id, u.firstname, u.lastname, c.name, c.id
 """
 
 

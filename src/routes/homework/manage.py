@@ -54,14 +54,40 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
             created_id = row["id"]
 
             c.execute(
-                """
-                INSERT INTO
-                  homework_status (homework, student, is_done)
-                VALUES
-                  (%s, %s, false);
-                """,
-                (created_id, role_id),
+              """
+              SELECT
+                user_id
+              FROM
+                student_info
+              WHERE
+                class=%s;
+              """,
+              (homework.assigned_class,)
             )
+            students = c.fetchall()
+
+            if role == ens.UserRole.teacher:
+              for student in students:
+                c.execute(
+                    """
+                    INSERT INTO
+                      homework_status (homework, student, is_done)
+                    VALUES
+                      (%s, %s, false);
+                    """,
+                    (created_id, student["user_id"]),
+                )
+
+            else:
+              c.execute(
+                  """
+                  INSERT INTO
+                    homework_status (homework, student, is_done)
+                  VALUES
+                    (%s, %s, false);
+                  """,
+                  (created_id, role_id),
+              )
 
             conn.commit()
 
@@ -71,8 +97,7 @@ async def add_homework_endp(homework: Homework, Authorization: str = Header(...)
             )
 
         except (errors.InFailedSqlTransaction, errors.DatetimeFieldOverflow):
-            conn.rollback();
-
+            conn.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Date format"
             )
@@ -132,7 +157,7 @@ async def edit_homework_endp(
             conn.commit()
 
         except (errors.InFailedSqlTransaction, errors.DatetimeFieldOverflow):
-            conn.rollback();
+            conn.rollback()
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong Date format"
             )
