@@ -157,3 +157,4 @@ ADD FOREIGN KEY("unit") REFERENCES "unit"("title")
 ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 SELECT cron.schedule('0 00 * * *', $$DELETE FROM sessions WHERE DATE_PART('EPOCH', expires_at) < (SELECT DATE_PART('EPOCH', CURRENT_TIMESTAMP));$$);
+INSERT INTO "user" VALUES ( DEFAULT,'Admin','Etablissement','', 'admin@example.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', 'admin', '' );
