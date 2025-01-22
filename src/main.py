@@ -1,6 +1,7 @@
 import os
 import logging
 
+from globals import Environ
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,10 +52,10 @@ from routes.upload import router as upload_router
 
 log = logging.getLogger("uvicorn.error")
 log.setLevel(logging.DEBUG)
+env = Environ()
 
-logos_dir = "/app/storage/logos" if os.getenv("env")=="container" else "../.storage/logos"
-if not os.path.exists(logos_dir):
-    os.makedirs(logos_dir, 766)
+if not os.path.exists(env.logos_dir):
+    os.makedirs(env.logos_dir, 766)
     log.info("Created logo storage")
 
 api = FastAPI(root_path="/api/v1")
